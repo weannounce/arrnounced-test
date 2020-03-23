@@ -9,12 +9,26 @@ sonarr_tx = []
 radarr_tx = []
 lidarr_tx = []
 
-def sonarr_send(approved):
-    sonarr_tx.append(approved)
-def radarr_send(approved):
-    radarr_tx.append(approved)
-def lidarr_send(approved):
-    lidarr_tx.append(approved)
+def sonarr_received():
+    return None if len(sonarr_rx) == 0 else sonarr_rx.pop(0)
+def radarr_received():
+    return None if len(radarr_rx) == 0 else radarr_rx.pop(0)
+def lidarr_received():
+    return None if len(lidarr_rx) == 0 else lidarr_rx.pop(0)
+
+def sonarr_send(response):
+    sonarr_tx.append(response)
+def radarr_send(response):
+    radarr_tx.append(response)
+def lidarr_send(response):
+    lidarr_tx.append(response)
+
+def sonarr_send_approved(approved):
+    sonarr_tx.append({"approved": approved})
+def radarr_send_approved(approved):
+    radarr_tx.append({"approved": approved})
+def lidarr_send_approved(approved):
+    lidarr_tx.append({"approved": approved})
 
 def clear_all_backends():
     global sonarr_rx
@@ -43,7 +57,7 @@ def run_backend(name, port, rx_list, tx_list):
         if len(tx_list) == 0:
             return jsonify({"approved": False})
         else:
-            return jsonify({"approved": tx_list.pop(0)})
+            return jsonify(tx_list.pop(0))
 
     @app.route('/api/v1/release/push', methods=['POST'])
     def push_v1():
@@ -52,7 +66,7 @@ def run_backend(name, port, rx_list, tx_list):
         if len(tx_list) == 0:
             return jsonify({"approved": False})
         else:
-            return jsonify({"approved": tx_list.pop(0)})
+            return jsonify(tx_list.pop(0))
 
     @app.route('/')
     def hello_world():

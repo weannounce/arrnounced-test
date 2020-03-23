@@ -13,6 +13,11 @@ async def announce(message):
     global client
     await client.send_message(message)
 
+
+async def disconnect():
+    global client
+    await client.disconnect(expected=True)
+
 class IRC(BotBase):
     #RECONNECT_MAX_ATTEMPTS = None
 
