@@ -11,10 +11,10 @@
 
 	<servers>
 		<server
-			network=""
-			serverNames=""
-			channelNames=""
-			announcerNames=""
+			network="NA"
+			serverNames="NA"
+			channelNames="#arrtstchnl,#arrtstchnlsnd"
+			announcerNames="arrtstprvidr"
 			/>
 	</servers>
 
