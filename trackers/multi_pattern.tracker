@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<trackerinfo
+	type="multi"
+	shortName="Multi"
+	longName="MultiPattern"
+	siteName="NA">
+
+	<settings>
+    <from_config/>
+	</settings>
+
+	<servers>
+		<server
+			network=""
+			serverNames=""
+			channelNames=""
+			announcerNames=""
+			/>
+	</servers>
+
+	<parseinfo>
+		<multilinepatterns>
+			<extract>
+				<regex value="^(New|Old):(.*)"/>
+				<vars>
+					<var name="$newOrOld"/>
+					<var name="torrentName"/>
+				</vars>
+			</extract>
+			<extract>
+				<regex value="^Category:(.*)$"/>
+				<vars>
+					<var name="category"/>
+				</vars>
+			</extract>
+			<extract>
+				<regex value="^PATH: https?\:\/\/([^\/]+\/).*[&amp;\?]id=(\d+)"/>
+				<vars>
+					<var name="$base"/>
+					<var name="$id"/>
+				</vars>
+			</extract>
+		</multilinepatterns>
+		<linematched>
+			<var name="torrentUrl">
+				<string value="http://"/>
+				<var name="$base"/>
+				<string value="dl.php/"/>
+				<var name="$id"/>
+				<string value="/"/>
+				<var name="from_config"/>
+				<string value="/"/>
+				<varenc name="torrentName"/>
+				<string value=".jpg"/>
+			</var>
+		</linematched>
+		<ignore>
+			<regex value="^(?:New|Old):" expected="false"/>
+		</ignore>
+	</parseinfo>
+</trackerinfo>

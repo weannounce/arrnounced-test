@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<trackerinfo
+	type="single"
+	shortName="Single"
+	longName="Single pattern"
+	siteName="NA">
+
+	<settings>
+		<gazelle_fixed1/>
+		<cookie_fixed2/>
+	</settings>
+
+	<servers>
+		<server
+			network=""
+			serverNames=""
+			channelNames=""
+			announcerNames=""
+			/>
+	</servers>
+
+	<parseinfo>
+		<linepatterns>
+			<extract>
+        <regex value="^(.*)\s+-\s+/([^\/]+)/.*#([^#]+)#\s*-\s*(.*)"/>
+				<vars>
+					<var name="torrentName"/>
+					<var name="$animal"/>
+					<var name="$mood"/>
+					<var name="food"/>
+				</vars>
+			</extract>
+			<extract>
+        <regex value="^(.*)\s+-\s+-([^\/]+)-.*=([^#]+)=\s*-\s*food:(.*)"/>
+				<vars>
+					<var name="torrentName"/>
+					<var name="$animal"/>
+					<var name="$mood"/>
+					<var name="food"/>
+				</vars>
+			</extract>
+		</linepatterns>
+		<linematched>
+			<var name="torrentUrl">
+				<string value="animal: "/>
+				<var name="$animal"/>
+				<string value=" &amp;mood="/>
+				<varenc name="$mood"/>
+				<string value=" f1: "/>
+				<var name="fixed1"/>
+				<string value=" f2: "/>
+				<var name="fixed2"/>
+			</var>
+		</linematched>
+		<ignore>
+		</ignore>
+	</parseinfo>
+</trackerinfo>
