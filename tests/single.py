@@ -9,7 +9,7 @@ class SingleTest(unittest.TestCase):
     def setUpClass(self):
         self.irc_thread = Thread(target=irc.run)
         self.irc_thread.start()
-        time.sleep(10)
+        irc.join_condition.wait()
         #test_backends.run_backends()
 
     @classmethod

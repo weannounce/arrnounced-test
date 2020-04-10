@@ -1,22 +1,21 @@
-#from asyncio import get_event_loop, gather, sleep
-from asyncio import new_event_loop, gather
+import asyncio
 import logging
 import pydle
 import socket
-import asyncio
 import time
 from . import config
+import threading
 
 
 client = None
-join_condition = asyncio.Event()
+join_condition = threading.Event()
 BotBase = pydle.featurize(pydle.features.RFC1459Support, pydle.features.TLSSupport)
 
 event_loop = None
 
 def run():
     global event_loop
-    event_loop = new_event_loop()
+    event_loop = asyncio.new_event_loop()
     irc_task = get_irc_task(
             config.irc_nickname,
             config.irc_channel,
@@ -74,7 +73,6 @@ class IRC(BotBase):
         await self.join(self.channel)
 
     async def on_join(self, channel, user):
-        #with join_condition:
         print("Joing channel " + channel)
         await super().on_join(channel, user)
         join_condition.set()
