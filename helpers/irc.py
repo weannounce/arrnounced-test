@@ -1,22 +1,54 @@
+#from asyncio import get_event_loop, gather, sleep
+from asyncio import new_event_loop, gather
 import logging
 import pydle
 import socket
-import threading
 import asyncio
+import time
+from . import config
+
 
 client = None
 join_condition = asyncio.Event()
-msg_condition = threading.Condition()
 BotBase = pydle.featurize(pydle.features.RFC1459Support, pydle.features.TLSSupport)
 
-async def announce(message):
-    global client
-    await client.send_message(message)
+event_loop = None
+
+def run():
+    global event_loop
+    event_loop = new_event_loop()
+    irc_task = get_irc_task(
+            config.irc_nickname,
+            config.irc_channel,
+            config.irc_server,
+            config.irc_port,
+            event_loop)
+
+    event_loop.create_task(irc_task)
+    event_loop.run_forever()
 
 
-async def disconnect():
+def stop():
     global client
-    await client.disconnect(expected=True)
+    global event_loop
+    print("Stopping IRC client")
+
+    asyncio.run_coroutine_threadsafe(client.disconnect(expected=True), event_loop)
+
+    while len(asyncio.all_tasks(event_loop)) != 0:
+        time.sleep(1)
+    event_loop.call_soon_threadsafe(event_loop.stop)
+
+    while event_loop.is_running():
+        time.sleep(1)
+    event_loop.close()
+
+def announce(message):
+    global client
+    global event_loop
+    asyncio.run_coroutine_threadsafe(client.send_message(message), event_loop)
+    time.sleep(2)
+
 
 class IRC(BotBase):
     #RECONNECT_MAX_ATTEMPTS = None
@@ -57,19 +89,5 @@ class IRC(BotBase):
 def get_irc_task(nickname, channel, server, port, event_loop):
     global client
 
-    #event_loop = get_event_loop()
     client = IRC(nickname, channel, event_loop)
     return client.connect(server, port)
-    #atasks = gather(client.connect(server, port),
-    #        m_loop(),
-    #        loop=event_loop)
-
-    #event_loop.run_until_complete(atasks)
-    #event_loop.run_forever()
-
-    #irc_thread = threading.Thread(target=event_loop.run_forever)
-    #irc_thread.start()
-
-    #client.run(server, port)
-    #irc_thread = threading.Thread(target=client.run, args=(server, port))
-    #irc_thread.start()

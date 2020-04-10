@@ -1,29 +1,47 @@
 import asyncio
 import unittest
+from helpers import irc
+from threading import Thread
+import time
 
-async def run_test(test_helper):
-    print("Running single test")
-    #test_helper.sonarr_send_approved(True)
+class SingleTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(self):
+        self.irc_thread = Thread(target=irc.run)
+        self.irc_thread.start()
+        time.sleep(10)
+        #test_backends.run_backends()
 
-    await test_helper.announce("this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce")
+    @classmethod
+    def tearDownClass(self):
+        irc.stop()
+        self.irc_thread.join()
 
-    await asyncio.sleep(2)
 
-    sr = test_helper.sonarr_received()
-    if sr == None:
-        print("SR was None")
-    else:
-        print("SR: " + str(sr))
+    def test_single(self):
+        print("Running single test")
+        irc.announce("asdfff")
+        #test_helper.sonarr_send_approved(True)
 
-    sr = test_helper.radarr_received()
-    if sr == None:
-        print("SR was None")
-    else:
-        print("SR: " + str(sr))
+        #await test_helper.announce("this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce")
 
-    sr = test_helper.lidarr_received()
-    if sr == None:
-        print("SR was None")
-    else:
-        print("SR: " + str(sr))
-    return True
+        #await asyncio.sleep(2)
+
+        #sr = test_helper.sonarr_received()
+        #if sr == None:
+        #    print("SR was None")
+        #else:
+        #    print("SR: " + str(sr))
+
+        #sr = test_helper.radarr_received()
+        #if sr == None:
+        #    print("SR was None")
+        #else:
+        #    print("SR: " + str(sr))
+
+        #sr = test_helper.lidarr_received()
+        #if sr == None:
+        #    print("SR was None")
+        #else:
+        #    print("SR: " + str(sr))
+        #return True
