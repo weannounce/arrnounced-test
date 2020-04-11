@@ -9,8 +9,8 @@ class SingleTest(unittest.TestCase):
     def setUpClass(self):
         self.irc_thread = Thread(target=irc.run)
         self.irc_thread.start()
-        irc.join_condition.wait()
         backends.run()
+        irc.ready_event.wait()
 
     @classmethod
     def tearDownClass(self):

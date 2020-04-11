@@ -6,11 +6,19 @@ import time
 from . import config
 import threading
 
+expected_channels = []
+expected_users = []
+ready_event = threading.Event()
 
 event_loop = None
 client = None
-join_condition = threading.Event()
 BotBase = pydle.featurize(pydle.features.RFC1459Support, pydle.features.TLSSupport)
+
+def notify_if_ready():
+    global expected_channels
+    global expected_users
+    if len(expected_channels) == 0 and len(expected_users) == 0:
+        ready_event.set()
 
 
 def announce(message):
@@ -44,12 +52,26 @@ class IRC(BotBase):
         await self.join(self.channel)
 
     async def on_join(self, channel, user):
-        print("Joing channel " + channel)
         await super().on_join(channel, user)
-        join_condition.set()
+        if user == config.irc_nickname:
+            print("Joing channel " + channel)
+            if channel in expected_channels:
+                expected_channels.remove(channel)
+        else:
+            if user in expected_users:
+                expected_users.remove(user)
+        notify_if_ready()
 
     async def on_message(self, target, source, message):
         print("Got message: " + message)
+
+    async def on_raw_353(self, message):
+        await super().on_raw_353(message)
+        _, _, _, names = message.params
+        for user in names.split(" "):
+            if user in expected_users:
+                expected_users.remove(user)
+        notify_if_ready()
 
     #async def on_raw(self, message):
     #    print(message)
@@ -64,10 +86,16 @@ def get_irc_task(nickname, channel, server, port, event_loop):
 
 def run():
     global event_loop
+    global expected_channels
+    global expected_users
+
+    expected_channels = config.irc_channels.split(",")
+    expected_users = config.irc_users
+
     event_loop = asyncio.new_event_loop()
     irc_task = get_irc_task(
             config.irc_nickname,
-            config.irc_channel,
+            config.irc_channels,
             config.irc_server,
             config.irc_port,
             event_loop)
