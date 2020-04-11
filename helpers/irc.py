@@ -37,7 +37,6 @@ class IRC(BotBase):
         self.channel = channel
 
     async def send_message(self, message):
-        print("sending message")
         await self.message(self.channel, message)
 
     async def connect(self, *args, **kwargs):
@@ -54,7 +53,6 @@ class IRC(BotBase):
     async def on_join(self, channel, user):
         await super().on_join(channel, user)
         if user == config.irc_nickname:
-            print("Joing channel " + channel)
             if channel in expected_channels:
                 expected_channels.remove(channel)
         else:

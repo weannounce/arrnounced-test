@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 import requests
 import threading
+from  datetime import datetime
 
 sonarr_rx = []
 radarr_rx = []
@@ -20,6 +21,22 @@ backends = { "sonarr": Backend("sonarr", 8989),
         "radarr": Backend("radarr", 7878),
         "lidarr": Backend("lidarr", 8686)}
 
+def get_date_diff(publish_date):
+    now = datetime.now()
+    dt = datetime.strptime(publish_date, "%Y-%m-%dT%H:%M:%S.%f")
+    return (now - dt).total_seconds()
+
+def check_sonarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
+    if len(sonarr_rx) == 0:
+        return False
+
+    rx = sonarr_rx.pop(0)
+
+    test_suite.assertEqual(title, rx["title"], "Title is not matching")
+    test_suite.assertEqual(dlUrl, rx["downloadUrl"], "Download URL is not matching")
+    test_suite.assertEqual(indexer, rx.get("indexer"), "Indexer is not matching")
+    test_suite.assertTrue(get_date_diff(rx["publishDate"]) < 5, "Publish date is too old")
+    test_suite.assertEqual(protocol, rx["protocol"], "Protocol is not matching")
 
 def sonarr_received():
     return None if len(sonarr_rx) == 0 else sonarr_rx.pop(0)

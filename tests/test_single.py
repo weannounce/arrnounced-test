@@ -18,26 +18,20 @@ class SingleTest(unittest.TestCase):
         self.irc_thread.join()
         backends.stop()
 
+    def setUp(self):
+        backends.clear_all_backends()
+
+    #def tearDown(self):
+
 
     def test_single(self):
-        print("Running single test")
         backends.sonarr_send_approved(True)
 
         irc.announce("this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce")
 
-        sr = backends.sonarr_received()
-        self.assertNotEqual(sr, None, "Not received by Sonarr")
-        self.assertEqual(sr["title"], "this is a name ")
-        self.assertEqual(sr["downloadUrl"], "animal: cow &mood=angry f1: first_fixed f2: fixed_second")
+        backends.check_sonarr_rx(self, "this is a name ",
+        "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
+        "IrcSingle")
 
-        sr = backends.radarr_received()
-        if sr == None:
-            print("SR was None")
-        else:
-            print("SR: " + str(sr))
-
-        sr = backends.lidarr_received()
-        if sr == None:
-            print("SR was None")
-        else:
-            print("SR: " + str(sr))
+        backends.radarr_received()
+        backends.lidarr_received()
