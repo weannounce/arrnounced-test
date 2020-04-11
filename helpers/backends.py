@@ -33,11 +33,18 @@ def get_date_diff(publish_date):
     return (now - dt).total_seconds()
 
 def check_sonarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
-    if len(sonarr_rx) == 0:
-        return False
+    _check_rx(sonarr_rx, test_suite, title, dlUrl, indexer, protocol)
+def check_radarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
+    _check_rx(radarr_rx, test_suite, title, dlUrl, indexer, protocol)
+def check_lidarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
+    _check_rx(lidarr_rx, test_suite, title, dlUrl, indexer, protocol)
 
-    rx = sonarr_rx.pop(0)
+def _check_rx(rx_list, test_suite, title, dlUrl, indexer, protocol):
+    test_suite.assertNotEqual(len(rx_list),0)
+    rx = rx_list.pop(0)
 
+    if indexer is not None:
+        indexer = "Irc" + indexer
     test_suite.assertEqual(title, rx["title"], "Title is not matching")
     test_suite.assertEqual(dlUrl, rx["downloadUrl"], "Download URL is not matching")
     test_suite.assertEqual(indexer, rx.get("indexer"), "Indexer is not matching")
