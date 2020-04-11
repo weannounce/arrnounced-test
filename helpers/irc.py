@@ -60,7 +60,7 @@ def get_irc_task(nickname, channel, server, port, event_loop):
     global client
 
     client = IRC(nickname, channel, event_loop)
-    return client.connect(server, port)
+    return client.connect(hostname=server, port=port)
 
 def run():
     global event_loop

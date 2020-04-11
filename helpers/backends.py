@@ -105,19 +105,19 @@ def stop():
             backends[b].thread = None
 
 
-def _create_thread(backend):
+def _create_thread(backend, rx_list, tx_list):
     backend.thread = threading.Thread(target=_run_backend,
-            args=(backend.name, backend.port, sonarr_rx, sonarr_tx))
+            args=(backend.name, backend.port, rx_list, tx_list))
     backend.thread.start()
 
 
 def run(sonarr=True, radarr=True, lidarr=True):
     global backends
     if sonarr:
-        _create_thread(backends["sonarr"])
+        _create_thread(backends["sonarr"], sonarr_rx, sonarr_tx)
 
     if radarr:
-        _create_thread(backends["radarr"])
+        _create_thread(backends["radarr"], radarr_rx, radarr_tx)
 
     if lidarr:
-        _create_thread(backends["lidarr"])
+        _create_thread(backends["lidarr"], lidarr_rx, lidarr_tx)

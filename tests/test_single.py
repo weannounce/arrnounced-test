@@ -21,18 +21,14 @@ class SingleTest(unittest.TestCase):
 
     def test_single(self):
         print("Running single test")
-        #irc.announce("asdfff")
-        #test_helper.sonarr_send_approved(True)
+        backends.sonarr_send_approved(True)
 
         irc.announce("this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce")
 
-        #await asyncio.sleep(2)
-
         sr = backends.sonarr_received()
-        if sr == None:
-            print("SR was None")
-        else:
-            print("SR: " + str(sr))
+        self.assertNotEqual(sr, None, "Not received by Sonarr")
+        self.assertEqual(sr["title"], "this is a name ")
+        self.assertEqual(sr["downloadUrl"], "animal: cow &mood=angry f1: first_fixed f2: fixed_second")
 
         sr = backends.radarr_received()
         if sr == None:
