@@ -2,6 +2,12 @@ from flask import Flask, request, jsonify
 import requests
 import threading
 from  datetime import datetime
+from enum import Enum
+
+class BackendType(Enum):
+    SONARR = 1
+    RADARR = 2
+    LIDARR = 3
 
 sonarr_rx = []
 radarr_rx = []
@@ -17,9 +23,9 @@ class Backend:
         self.port = port
         self.thread = None
 
-backends = { "sonarr": Backend("sonarr", 8989),
-        "radarr": Backend("radarr", 7878),
-        "lidarr": Backend("lidarr", 8686)}
+backends = { BackendType.SONARR: Backend("sonarr", 8989),
+        BackendType.RADARR: Backend("radarr", 7878),
+        BackendType.LIDARR: Backend("lidarr", 8686)}
 
 def get_date_diff(publish_date):
     now = datetime.now()
@@ -75,12 +81,30 @@ def clear_all_backends():
     radarr_tx = []
     lidarr_tx = []
 
+def get_tx_list(backend_type):
+    if backend_type == BackendType.SONARR:
+        return sonarr_tx
+    if backend_type == BackendType.RADARR:
+        return radarr_tx
+    if backend_type == BackendType.LIDARR:
+        return lidarr_tx
 
-def _run_backend(name, port, rx_list, tx_list):
+def get_rx_list(backend_type):
+    if backend_type == BackendType.SONARR:
+        return sonarr_rx
+    if backend_type == BackendType.RADARR:
+        return radarr_rx
+    if backend_type == BackendType.LIDARR:
+        return lidarr_rx
+
+def _run_backend(name, port, backend_type):
     app = Flask(name)
 
     @app.route('/api/release/push', methods=['POST'])
     def push():
+        rx_list = get_rx_list(backend_type)
+        tx_list = get_tx_list(backend_type)
+
         rx_list.append(request.json)
 
         if len(tx_list) == 0:
@@ -90,6 +114,9 @@ def _run_backend(name, port, rx_list, tx_list):
 
     @app.route('/api/v1/release/push', methods=['POST'])
     def push_v1():
+        rx_list = get_rx_list(backend_type)
+        tx_list = get_tx_list(backend_type)
+
         rx_list.append(request.json)
 
         if len(tx_list) == 0:
@@ -122,19 +149,19 @@ def stop():
             backends[b].thread = None
 
 
-def _create_thread(backend, rx_list, tx_list):
-    backend.thread = threading.Thread(target=_run_backend,
-            args=(backend.name, backend.port, rx_list, tx_list))
-    backend.thread.start()
+def _create_thread(backend_type):
+    global backends
+    backends[backend_type].thread = threading.Thread(target=_run_backend,
+            args=(backends[backend_type].name, backends[backend_type].port, backend_type))
+    backends[backend_type].thread.start()
 
 
 def run(sonarr=True, radarr=True, lidarr=True):
-    global backends
     if sonarr:
-        _create_thread(backends["sonarr"], sonarr_rx, sonarr_tx)
+        _create_thread(BackendType.SONARR)
 
     if radarr:
-        _create_thread(backends["radarr"], radarr_rx, radarr_tx)
+        _create_thread(BackendType.RADARR)
 
     if lidarr:
-        _create_thread(backends["lidarr"], lidarr_rx, lidarr_tx)
+        _create_thread(BackendType.LIDARR)
