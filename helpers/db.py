@@ -1,0 +1,71 @@
+import datetime
+from pony.orm import Database, desc, pony, Required, Set
+from pony.orm import db_session  # noqa: F401
+import os
+from . import config
+from  datetime import datetime
+
+db = Database()
+class Announced(db.Entity):
+    date = Required(datetime)
+    title = Required(str)
+    indexer = Required(str)
+    torrent = Required(str)
+    backend = Required(str)
+    snatched = Set("Snatched")
+
+
+class Snatched(db.Entity):
+    date = Required(datetime)
+    announced = Required(Announced)
+    backend = Required(str)
+
+def init():
+    db.bind(
+        "sqlite",
+        os.path.join(os.path.realpath(config.db_path), "brain.db"),
+        create_db=False,
+    )
+    db.generate_mapping(create_tables=False)
+
+def clear_db():
+    Announced.select().delete()
+    Snatched.select().delete()
+
+def get_date_diff(date):
+    return (datetime.now() - date).total_seconds()
+
+def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backends=[]):
+    announcements = get_announced(1)
+    test_suite.assertEqual(len(announcements), 1, "No announcement in ddatabase")
+    announcement = announcements[0]
+
+    test_suite.assertTrue(get_date_diff(announcement.date) < 5, "Publish date is too old")
+    test_suite.assertEqual(title, announcement.title, "Title is not matching")
+    test_suite.assertEqual(indexer, announcement.indexer, "Indexer is not matching")
+    test_suite.assertEqual(dlUrl, announcement.torrent, "Download URL is not matching")
+
+    print(announcement.backend)
+    backends = announcement.backend.split("/")
+    test_suite.assertEqual(len(backends), len(backends), "Backends length does not match")
+    for backend in backends:
+        test_suite.assertTrue(backend in backends, "Did not find expected backend")
+
+    test_suite.assertEqual(len(snatched_backends), len(announcement.snatched), "Snatched incorrect amount of times")
+    for snatch in announcement.snatched:
+        test_suite.assertTrue(snatch.backend in snatched_backends, "Did not find expected backend")
+
+
+def get_announced(limit=None):
+    return (
+        Announced.select()
+        .order_by(desc(Announced.id))
+        .limit(limit)
+    )
+
+def get_snatched(limit=None):
+    return (
+        Snatched.select()
+        .order_by(desc(Snatched.id))
+        .limit(limit)
+    )
