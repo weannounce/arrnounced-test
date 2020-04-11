@@ -7,40 +7,11 @@ from . import config
 import threading
 
 
+event_loop = None
 client = None
 join_condition = threading.Event()
 BotBase = pydle.featurize(pydle.features.RFC1459Support, pydle.features.TLSSupport)
 
-event_loop = None
-
-def run():
-    global event_loop
-    event_loop = asyncio.new_event_loop()
-    irc_task = get_irc_task(
-            config.irc_nickname,
-            config.irc_channel,
-            config.irc_server,
-            config.irc_port,
-            event_loop)
-
-    event_loop.create_task(irc_task)
-    event_loop.run_forever()
-
-
-def stop():
-    global client
-    global event_loop
-    print("Stopping IRC client")
-
-    asyncio.run_coroutine_threadsafe(client.disconnect(expected=True), event_loop)
-
-    while len(asyncio.all_tasks(event_loop)) != 0:
-        time.sleep(1)
-    event_loop.call_soon_threadsafe(event_loop.stop)
-
-    while event_loop.is_running():
-        time.sleep(1)
-    event_loop.close()
 
 def announce(message):
     global client
@@ -84,8 +55,39 @@ class IRC(BotBase):
     #    print(message)
     #    await super().on_raw(message)
 
+
 def get_irc_task(nickname, channel, server, port, event_loop):
     global client
 
     client = IRC(nickname, channel, event_loop)
     return client.connect(server, port)
+
+def run():
+    global event_loop
+    event_loop = asyncio.new_event_loop()
+    irc_task = get_irc_task(
+            config.irc_nickname,
+            config.irc_channel,
+            config.irc_server,
+            config.irc_port,
+            event_loop)
+
+    event_loop.create_task(irc_task)
+    event_loop.run_forever()
+
+
+def stop():
+    global client
+    global event_loop
+    print("Stopping IRC client")
+
+    asyncio.run_coroutine_threadsafe(client.disconnect(expected=True), event_loop)
+
+    while len(asyncio.all_tasks(event_loop)) != 0:
+        time.sleep(1)
+    event_loop.call_soon_threadsafe(event_loop.stop)
+
+    while event_loop.is_running():
+        time.sleep(1)
+    event_loop.close()
+

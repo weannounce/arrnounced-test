@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
+import requests
 import threading
-import time
+
 sonarr_rx = []
 radarr_rx = []
 lidarr_rx = []
@@ -8,6 +9,17 @@ lidarr_rx = []
 sonarr_tx = []
 radarr_tx = []
 lidarr_tx = []
+
+class Backend:
+    def __init__(self, name, port):
+        self.name = name
+        self.port = port
+        self.thread = None
+
+backends = { "sonarr": Backend("sonarr", 8989),
+        "radarr": Backend("radarr", 7878),
+        "lidarr": Backend("lidarr", 8686)}
+
 
 def sonarr_received():
     return None if len(sonarr_rx) == 0 else sonarr_rx.pop(0)
@@ -47,7 +59,7 @@ def clear_all_backends():
     lidarr_tx = []
 
 
-def run_backend(name, port, rx_list, tx_list):
+def _run_backend(name, port, rx_list, tx_list):
     app = Flask(name)
 
     @app.route('/api/release/push', methods=['POST'])
@@ -68,34 +80,44 @@ def run_backend(name, port, rx_list, tx_list):
         else:
             return jsonify(tx_list.pop(0))
 
-    @app.route('/')
-    def hello_world():
-        print(request.json)
-        return "Hello world!"
+    @app.route('/shutdown')
+    def shutdown():
+        func = request.environ.get('werkzeug.server.shutdown')
+        if func is None:
+            raise RuntimeError('Not running with the Werkzeug Server')
+        func()
+        return "Shutting down..."
 
     app.run(port=port)
 
-def run_backends():
-    sonarr_thread = threading.Thread(target=run_backend, args=("sonarr", 8989, sonarr_rx, sonarr_tx))
-    sonarr_thread.start()
 
-    radarr_thread = threading.Thread(target=run_backend, args=("radarr", 7878, radarr_rx, radarr_tx))
-    radarr_thread.start()
+def _call_shutdown(port):
+    return requests.get("http://localhost:{}/shutdown".format(port)).status_code == 200
 
-    lidarr_thread = threading.Thread(target=run_backend, args=("lidarr", 8686, lidarr_rx, lidarr_tx))
-    lidarr_thread.start()
 
-#lidarr_send(False)
-#lidarr_send(True)
-#
-#while True:
-#    time.sleep(10)
-#    if 0 != len(sonarr_rx):
-#        print("sonarr: ", sonarr_rx)
-#        sonarr_rx = []
-#    if 0 != len(radarr_rx):
-#        print("radarr: ", radarr_rx)
-#        radarr_rx = []
-#    if 0 != len(lidarr_rx):
-#        print("lidarr: ", lidarr_rx)
-#        lidarr_rx = []
+def stop():
+    global backends
+    for b in backends.keys():
+        if backends[b].thread is not None:
+            if not _call_shutdown(backends[b].port):
+                print("Could not shutdown " + backends[b].name)
+            backends[b].thread.join()
+            backends[b].thread = None
+
+
+def _create_thread(backend):
+    backend.thread = threading.Thread(target=_run_backend,
+            args=(backend.name, backend.port, sonarr_rx, sonarr_tx))
+    backend.thread.start()
+
+
+def run(sonarr=True, radarr=True, lidarr=True):
+    global backends
+    if sonarr:
+        _create_thread(backends["sonarr"])
+
+    if radarr:
+        _create_thread(backends["radarr"])
+
+    if lidarr:
+        _create_thread(backends["lidarr"])
