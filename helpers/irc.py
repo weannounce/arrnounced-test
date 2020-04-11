@@ -21,10 +21,10 @@ def notify_if_ready():
         ready_event.set()
 
 
-def announce(message):
+def announce(channel, message):
     global client
     global event_loop
-    asyncio.run_coroutine_threadsafe(client.send_message(message), event_loop)
+    asyncio.run_coroutine_threadsafe(client.send_message(channel, message), event_loop)
     time.sleep(2)
 
 
@@ -36,8 +36,8 @@ class IRC(BotBase):
         self.nickname = nickname
         self.channel = channel
 
-    async def send_message(self, message):
-        await self.message(self.channel, message)
+    async def send_message(self, channel, message):
+        await self.message(channel, message)
 
     async def connect(self, *args, **kwargs):
         try:
