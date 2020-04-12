@@ -14,6 +14,7 @@ event_loop = None
 client = None
 BotBase = pydle.featurize(pydle.features.RFC1459Support, pydle.features.TLSSupport)
 
+
 def notify_if_ready():
     global expected_channels
     global expected_users
@@ -29,7 +30,7 @@ def announce(channel, message):
 
 
 class IRC(BotBase):
-    #RECONNECT_MAX_ATTEMPTS = None
+    # RECONNECT_MAX_ATTEMPTS = None
 
     def __init__(self, nickname, channel, event_loop):
         super().__init__(nickname, eventloop=event_loop)
@@ -71,7 +72,7 @@ class IRC(BotBase):
                 expected_users.remove(user)
         notify_if_ready()
 
-    #async def on_raw(self, message):
+    # async def on_raw(self, message):
     #    print(message)
     #    await super().on_raw(message)
 
@@ -81,6 +82,7 @@ def get_irc_task(nickname, channel, server, port, event_loop):
 
     client = IRC(nickname, channel, event_loop)
     return client.connect(hostname=server, port=port)
+
 
 def run():
     global event_loop
@@ -92,11 +94,12 @@ def run():
 
     event_loop = asyncio.new_event_loop()
     irc_task = get_irc_task(
-            config.irc_nickname,
-            config.irc_channels,
-            config.irc_server,
-            config.irc_port,
-            event_loop)
+        config.irc_nickname,
+        config.irc_channels,
+        config.irc_server,
+        config.irc_port,
+        event_loop,
+    )
 
     event_loop.create_task(irc_task)
     event_loop.run_forever()
@@ -116,4 +119,3 @@ def stop():
     while event_loop.is_running():
         time.sleep(1)
     event_loop.close()
-

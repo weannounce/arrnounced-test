@@ -3,9 +3,11 @@ from pony.orm import Database, desc, pony, Required, Set
 from pony.orm import db_session  # noqa: F401
 import os
 from . import config
-from  datetime import datetime
+from datetime import datetime
 
 db = Database()
+
+
 class Announced(db.Entity):
     date = Required(datetime)
     title = Required(str)
@@ -20,6 +22,7 @@ class Snatched(db.Entity):
     announced = Required(Announced)
     backend = Required(str)
 
+
 def init():
     db.bind(
         "sqlite",
@@ -28,16 +31,20 @@ def init():
     )
     db.generate_mapping(create_tables=False)
 
+
 def stop():
     global db
     db = Database()
+
 
 def clear_db():
     Announced.select().delete()
     Snatched.select().delete()
 
+
 def get_date_diff(date):
     return (datetime.now() - date).total_seconds()
+
 
 @db_session
 def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backends=[]):
@@ -45,52 +52,49 @@ def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backen
     test_suite.assertEqual(len(announcements), 1, "No announcement in ddatabase")
     announcement = announcements[0]
 
-    test_suite.assertTrue(get_date_diff(announcement.date) < 5, "Publish date is too old")
+    test_suite.assertTrue(
+        get_date_diff(announcement.date) < 5, "Publish date is too old"
+    )
     test_suite.assertEqual(title, announcement.title, "Title is not matching")
     test_suite.assertEqual(indexer, announcement.indexer, "Indexer is not matching")
     test_suite.assertEqual(dlUrl, announcement.torrent, "Download URL is not matching")
 
     backends = announcement.backend.split("/")
-    test_suite.assertEqual(len(backends), len(backends), "Backends length does not match")
+    test_suite.assertEqual(
+        len(backends), len(backends), "Backends length does not match"
+    )
     for backend in backends:
         test_suite.assertTrue(backend in backends, "Did not find expected backend")
 
-    test_suite.assertEqual(len(snatched_backends), len(announcement.snatched), "Snatched incorrect amount of times")
+    test_suite.assertEqual(
+        len(snatched_backends),
+        len(announcement.snatched),
+        "Snatched incorrect amount of times",
+    )
     for snatch in announcement.snatched:
-        test_suite.assertTrue(snatch.backend in snatched_backends, "Did not find expected backend")
+        test_suite.assertTrue(
+            snatch.backend in snatched_backends, "Did not find expected backend"
+        )
+
 
 @db_session
 def get_announce_id(index=0):
-    return (
-        Announced.select()
-        .order_by(desc(Announced.id))
-        .limit(1, offset=index)[0]
-    )
+    return Announced.select().order_by(desc(Announced.id)).limit(1, offset=index)[0]
+
 
 @db_session
 def nr_announcements():
-    return len(
-        Announced.select()
-        .order_by(desc(Announced.id))
-    )
+    return len(Announced.select().order_by(desc(Announced.id)))
+
 
 @db_session
 def nr_snatches():
-    return len(
-        Snatched.select()
-        .order_by(desc(Snatched.id))
-    )
+    return len(Snatched.select().order_by(desc(Snatched.id)))
+
 
 def _get_announced(limit=None):
-    return (
-        Announced.select()
-        .order_by(desc(Announced.id))
-        .limit(limit)
-    )
+    return Announced.select().order_by(desc(Announced.id)).limit(limit)
+
 
 def _get_snatched(limit=None):
-    return (
-        Snatched.select()
-        .order_by(desc(Snatched.id))
-        .limit(limit)
-    )
+    return Snatched.select().order_by(desc(Snatched.id)).limit(limit)
