@@ -1,5 +1,4 @@
-import datetime
-from pony.orm import Database, desc, pony, Required, Set
+from pony.orm import Database, desc, Required, Set
 from pony.orm import db_session  # noqa: F401
 import os
 from . import config

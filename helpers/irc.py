@@ -1,5 +1,4 @@
 import asyncio
-import logging
 import pydle
 import socket
 import time

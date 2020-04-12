@@ -1,8 +1,6 @@
-import asyncio
 import unittest
 from helpers import db, irc, backends, web
 from threading import Thread
-import time
 
 channel = "#multi"
 
