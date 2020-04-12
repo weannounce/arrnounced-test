@@ -36,8 +36,8 @@ def check_sonarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
     _check_rx(sonarr_rx, test_suite, title, dlUrl, indexer, protocol)
 def check_radarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
     _check_rx(radarr_rx, test_suite, title, dlUrl, indexer, protocol)
-def check_lidarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
-    _check_rx(lidarr_rx, test_suite, title, dlUrl, indexer, protocol)
+def check_lidarr_rx(test_suite, title, dlUrl, protocol="Torrent"):
+    _check_rx(lidarr_rx, test_suite, title, dlUrl, None, protocol)
 
 def _check_rx(rx_list, test_suite, title, dlUrl, indexer, protocol):
     test_suite.assertNotEqual(len(rx_list),0)
@@ -50,6 +50,19 @@ def _check_rx(rx_list, test_suite, title, dlUrl, indexer, protocol):
     test_suite.assertEqual(indexer, rx.get("indexer"), "Indexer is not matching")
     test_suite.assertTrue(get_date_diff(rx["publishDate"]) < 5, "Publish date is too old")
     test_suite.assertEqual(protocol, rx["protocol"], "Protocol is not matching")
+
+def sonarr_max_announcements(test_suite, nr):
+    for i in range(nr):
+        sonarr_received()
+    test_suite.assertEqual(sonarr_received(), None)
+def radarr_max_announcements(test_suite, nr):
+    for i in range(nr):
+        radarr_received()
+    test_suite.assertEqual(radarr_received(), None)
+def lidarr_max_announcements(test_suite, nr):
+    for i in range(nr):
+        lidarr_received()
+    test_suite.assertEqual(lidarr_received(), None)
 
 def sonarr_received():
     return None if len(sonarr_rx) == 0 else sonarr_rx.pop(0)

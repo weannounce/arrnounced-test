@@ -35,8 +35,9 @@ def clear_db():
 def get_date_diff(date):
     return (datetime.now() - date).total_seconds()
 
+@db_session
 def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backends=[]):
-    announcements = get_announced(1)
+    announcements = _get_announced(1)
     test_suite.assertEqual(len(announcements), 1, "No announcement in ddatabase")
     announcement = announcements[0]
 
@@ -45,25 +46,46 @@ def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backen
     test_suite.assertEqual(indexer, announcement.indexer, "Indexer is not matching")
     test_suite.assertEqual(dlUrl, announcement.torrent, "Download URL is not matching")
 
-    print(announcement.backend)
     backends = announcement.backend.split("/")
     test_suite.assertEqual(len(backends), len(backends), "Backends length does not match")
     for backend in backends:
         test_suite.assertTrue(backend in backends, "Did not find expected backend")
 
+    print(announcement.snatched)
     test_suite.assertEqual(len(snatched_backends), len(announcement.snatched), "Snatched incorrect amount of times")
     for snatch in announcement.snatched:
         test_suite.assertTrue(snatch.backend in snatched_backends, "Did not find expected backend")
 
+@db_session
+def get_announce_id(index=0):
+    return (
+        Announced.select()
+        .order_by(desc(Announced.id))
+        .limit(1, offset=index)[0]
+    )
 
-def get_announced(limit=None):
+@db_session
+def nr_announcements():
+    return len(
+        Announced.select()
+        .order_by(desc(Announced.id))
+    )
+
+@db_session
+def nr_snatches():
+    return len(
+        Snatched.select()
+        .order_by(desc(Snatched.id))
+    )
+
+def _get_announced(limit=None):
     return (
         Announced.select()
         .order_by(desc(Announced.id))
         .limit(limit)
     )
 
-def get_snatched(limit=None):
+def _get_snatched(limit=None):
     return (
         Snatched.select()
         .order_by(desc(Snatched.id))

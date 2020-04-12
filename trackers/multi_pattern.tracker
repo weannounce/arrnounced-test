@@ -13,7 +13,7 @@
 		<server
 			network="NA"
 			serverNames="NA"
-			channelNames="#arrtstchnl,#arrtstchnlsnd"
+			channelNames="#multi"
 			announcerNames="arrtstprvidr"
 			/>
 	</servers>
