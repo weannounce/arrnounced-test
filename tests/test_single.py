@@ -19,11 +19,24 @@ class SingleTest(unittest.TestCase):
         irc.stop()
         self.irc_thread.join()
         backends.stop()
+        db.stop()
 
     @db.db_session
     def setUp(self):
         backends.clear_all_backends()
         db.clear_db()
+
+    def tearDown(self):
+        web.logout()
+
+    def test_no_match(self):
+        irc.announce(channel, "this is a name  -  cow/ ¤/(- #angry#  -  pasta and sauce")
+
+        backends.sonarr_max_announcements(self, 0)
+        backends.radarr_max_announcements(self, 0)
+        backends.lidarr_max_announcements(self, 0)
+        self.assertEqual(db.nr_announcements(), 0)
+        self.assertEqual(db.nr_snatches(), 0)
 
     def test_no_snatch(self):
         irc.announce(channel, "this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce")

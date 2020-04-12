@@ -28,6 +28,10 @@ def init():
     )
     db.generate_mapping(create_tables=False)
 
+def stop():
+    global db
+    db = Database()
+
 def clear_db():
     Announced.select().delete()
     Snatched.select().delete()
@@ -51,7 +55,6 @@ def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backen
     for backend in backends:
         test_suite.assertTrue(backend in backends, "Did not find expected backend")
 
-    print(announcement.snatched)
     test_suite.assertEqual(len(snatched_backends), len(announcement.snatched), "Snatched incorrect amount of times")
     for snatch in announcement.snatched:
         test_suite.assertTrue(snatch.backend in snatched_backends, "Did not find expected backend")

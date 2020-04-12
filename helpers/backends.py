@@ -40,7 +40,7 @@ def check_lidarr_rx(test_suite, title, dlUrl, protocol="Torrent"):
     _check_rx(lidarr_rx, test_suite, title, dlUrl, None, protocol)
 
 def _check_rx(rx_list, test_suite, title, dlUrl, indexer, protocol):
-    test_suite.assertNotEqual(len(rx_list),0)
+    test_suite.assertNotEqual(len(rx_list), 0, "No announcements to this backend")
     rx = rx_list.pop(0)
 
     if indexer is not None:
