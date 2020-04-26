@@ -89,8 +89,8 @@ class SingleTest(unittest.TestCase):
             "http://example/dl.php/54321/config_string/second+multi.jpg",
             "Multi",
         )
-        backends.radarr_max_announcements(self, 1)
-        backends.lidarr_max_announcements(self, 1)
+        backends.radarr_max_announcements(self, 0)
+        backends.lidarr_max_announcements(self, 0)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
@@ -114,8 +114,8 @@ class SingleTest(unittest.TestCase):
         backends.check_radarr_rx(
             self, "third", "http://ex/dl.php/99/config_string/third.jpg", "Multi"
         )
-        backends.radarr_max_announcements(self, 1)
-        backends.lidarr_max_announcements(self, 1)
+        backends.radarr_max_announcements(self, 0)
+        backends.lidarr_max_announcements(self, 0)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
@@ -136,8 +136,8 @@ class SingleTest(unittest.TestCase):
         backends.check_lidarr_rx(
             self, "third", "http://ex/dl.php/99/config_string/third.jpg"
         )
-        backends.sonarr_max_announcements(self, 1)
-        backends.radarr_max_announcements(self, 1)
+        backends.sonarr_max_announcements(self, 0)
+        backends.radarr_max_announcements(self, 0)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 2)
