@@ -1,5 +1,5 @@
 import unittest
-from helpers import db, irc, backends, web
+from helpers import db, irc, backends, web, browser
 from threading import Thread
 
 channel = "#single"
@@ -13,6 +13,7 @@ class SingleTest(unittest.TestCase):
         backends.run()
         irc.ready_event.wait()
         db.init()
+        browser.init()
 
     @classmethod
     def tearDownClass(self):
@@ -20,6 +21,7 @@ class SingleTest(unittest.TestCase):
         self.irc_thread.join()
         backends.stop()
         db.stop()
+        browser.stop()
 
     @db.db_session
     def setUp(self):
@@ -72,6 +74,10 @@ class SingleTest(unittest.TestCase):
             "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
             "Single",
             ["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        browser.check_announced(
+            self, "this is a name", "Single", ["Sonarr", "Radarr", "Lidarr"],
         )
 
     def test_sonarr_snatch(self):
