@@ -58,12 +58,12 @@ def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backen
     test_suite.assertEqual(indexer, announcement.indexer, "Indexer is not matching")
     test_suite.assertEqual(dlUrl, announcement.torrent, "Download URL is not matching")
 
-    backends = announcement.backend.split("/")
+    db_backends = announcement.backend.split("/")
     test_suite.assertEqual(
-        len(backends), len(backends), "Backends length does not match"
+        len(db_backends), len(backends), "Backends length does not match"
     )
     for backend in backends:
-        test_suite.assertTrue(backend in backends, "Did not find expected backend")
+        test_suite.assertTrue(backend in db_backends, "Did not find expected backend")
 
     test_suite.assertEqual(
         len(snatched_backends),
