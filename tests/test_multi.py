@@ -1,5 +1,5 @@
 import unittest
-from helpers import db, irc, backends, web
+from helpers import db, irc, backends, web, browser, misc
 from threading import Thread
 
 channel = "#multi"
@@ -11,16 +11,18 @@ class SingleTest(unittest.TestCase):
         self.irc_thread = Thread(target=irc.run)
         self.irc_thread.start()
         backends.run()
-        irc.ready_event.wait()
         db.init()
+        browser.init()
+        irc.ready_event.wait()
 
     @classmethod
     def tearDownClass(self):
         irc.stop()
-        self.irc_thread.join()
         backends.stop()
-        irc.ready_event.clear()
         db.stop()
+        browser.stop()
+        self.irc_thread.join()
+        irc.ready_event.clear()
 
     @db.db_session
     def setUp(self):
@@ -68,7 +70,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "multi title",
             "http://example/dl.php/12345/config_string/multi+title.jpg",
@@ -95,7 +97,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "second multi",
             "http://example/dl.php/54321/config_string/second+multi.jpg",
@@ -120,7 +122,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "third",
             "http://ex/dl.php/99/config_string/third.jpg",

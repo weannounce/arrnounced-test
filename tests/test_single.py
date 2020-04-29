@@ -11,17 +11,18 @@ class SingleTest(unittest.TestCase):
         self.irc_thread = Thread(target=irc.run)
         self.irc_thread.start()
         backends.run()
-        irc.ready_event.wait()
         db.init()
         browser.init()
+        irc.ready_event.wait()
 
     @classmethod
     def tearDownClass(self):
         irc.stop()
-        self.irc_thread.join()
         backends.stop()
         db.stop()
         browser.stop()
+        self.irc_thread.join()
+        irc.ready_event.clear()
 
     @db.db_session
     def setUp(self):
@@ -93,7 +94,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "son snatch",
             "animal: dog &mood=sad f1: first_fixed f2: fixed_second",
@@ -144,7 +145,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "lid snatch",
             "animal: rat &mood=curios f1: first_fixed f2: fixed_second",
@@ -171,7 +172,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "son snatch2",
             "animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
