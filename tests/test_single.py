@@ -1,5 +1,5 @@
 import unittest
-from helpers import db, irc, backends, web, browser
+from helpers import db, irc, backends, web, browser, misc
 from threading import Thread
 
 channel = "#single"
@@ -68,16 +68,12 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "this is a name",
             "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
             "Single",
             ["Sonarr", "Radarr", "Lidarr"],
-        )
-
-        browser.check_announced(
-            self, "this is a name", "Single", ["Sonarr", "Radarr", "Lidarr"],
         )
 
     def test_sonarr_snatch(self):
@@ -123,7 +119,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
-        db.check_announced(
+        misc.check_announced(
             self,
             "rad snatch",
             "animal: cat &mood=happy f1: first_fixed f2: fixed_second",

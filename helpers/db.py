@@ -46,7 +46,7 @@ def get_date_diff(date):
 
 
 @db_session
-def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backends=[]):
+def check_announced(test_suite, title, dl_url, indexer, backends, snatched_backends=[]):
     announcements = _get_announced(1)
     test_suite.assertEqual(len(announcements), 1, "No announcement in ddatabase")
     announcement = announcements[0]
@@ -56,7 +56,7 @@ def check_announced(test_suite, title, dlUrl, indexer, backends, snatched_backen
     )
     test_suite.assertEqual(title, announcement.title, "Title is not matching")
     test_suite.assertEqual(indexer, announcement.indexer, "Indexer is not matching")
-    test_suite.assertEqual(dlUrl, announcement.torrent, "Download URL is not matching")
+    test_suite.assertEqual(dl_url, announcement.torrent, "Download URL is not matching")
 
     db_backends = announcement.backend.split("/")
     test_suite.assertEqual(
