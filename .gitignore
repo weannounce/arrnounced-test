@@ -26,3 +26,6 @@ __pycache__/
 
 # generators
 *.bat
+
+.coverage
+htmlcov
