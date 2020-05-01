@@ -38,8 +38,8 @@ then
   trap "docker stop $container_name"  EXIT
 else
   echo "Running from source..."
-  ../arrnounced/src/arrnounced.py -v -c data/settings.cfg -d data -t trackers &
-  trap 'kill %1' EXIT
+  coverage run --source ../arrnounced/src ../arrnounced/src/arrnounced.py -v -c data/settings.cfg -d data -t trackers &
+  trap 'curl -s http://localhost:3467/shutdown' EXIT
 fi
 
 ./run_tests.py
