@@ -156,7 +156,6 @@ class SingleTest(unittest.TestCase):
 
     def test_renotify_radarr(self):
         backends.sonarr_send_approved(True)
-        backends.sonarr_send_approved(True)
 
         irc.announce(channel, "son snatch2  -  /horsie/ ¤/(- #calm#  -  pasta")
 
@@ -182,7 +181,10 @@ class SingleTest(unittest.TestCase):
         )
 
         backends.radarr_send_approved(True)
+
         web.login()
+        web.renotify(self, db.get_announce_id(), "Sonarr")
+        web.renotify(self, db.get_announce_id(), "Lidarr")
         web.renotify(self, db.get_announce_id(), "Radarr")
 
         backends.check_radarr_rx(
@@ -203,3 +205,29 @@ class SingleTest(unittest.TestCase):
             ["Sonarr", "Radarr", "Lidarr"],
             ["Sonarr", "Radarr"],
         )
+
+    def test_renotify_nonexistant(self):
+        irc.announce(channel, "title  -  /some/ ¤/(- #thing#  -  pasta")
+
+        backends.sonarr_max_announcements(self, 1)
+        backends.radarr_max_announcements(self, 1)
+        backends.lidarr_max_announcements(self, 1)
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
+
+        misc.check_announced(
+            self,
+            "title",
+            "animal: some &mood=thing f1: first_fixed f2: fixed_second",
+            "Single",
+            ["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        web.login()
+        web.renotify(self, db.get_announce_id(), "NonExistant")
+
+        backends.sonarr_max_announcements(self, 1)
+        backends.radarr_max_announcements(self, 1)
+        backends.lidarr_max_announcements(self, 1)
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
