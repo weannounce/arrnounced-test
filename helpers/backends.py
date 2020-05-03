@@ -40,47 +40,53 @@ def get_date_diff(publish_date):
     return (now - dt).total_seconds()
 
 
-def check_sonarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
-    _check_rx(sonarr_rx, test_suite, title, dlUrl, indexer, protocol)
+def check_sonarr_rx(test_suite, release):
+    _check_rx(sonarr_rx, test_suite, release)
 
 
-def check_radarr_rx(test_suite, title, dlUrl, indexer, protocol="Torrent"):
-    _check_rx(radarr_rx, test_suite, title, dlUrl, indexer, protocol)
+def check_radarr_rx(test_suite, release):
+    _check_rx(radarr_rx, test_suite, release)
 
 
-def check_lidarr_rx(test_suite, title, dlUrl, protocol="Torrent"):
-    _check_rx(lidarr_rx, test_suite, title, dlUrl, None, protocol)
+def check_lidarr_rx(test_suite, release):
+    temp_indexer = release.indexer
+    release.indexer = None
+    _check_rx(lidarr_rx, test_suite, release)
+    release.indexer = temp_indexer
 
 
-def _check_rx(rx_list, test_suite, title, dlUrl, indexer, protocol):
+def _check_rx(rx_list, test_suite, release):
     test_suite.assertNotEqual(len(rx_list), 0, "No announcements to this backend")
     rx = rx_list.pop(0)
 
-    if indexer is not None:
-        indexer = "Irc" + indexer
-    test_suite.assertEqual(title, rx["title"], "Title is not matching")
-    test_suite.assertEqual(dlUrl, rx["downloadUrl"], "Download URL is not matching")
-    test_suite.assertEqual(indexer, rx.get("indexer"), "Indexer is not matching")
+    local_indexer = None
+    if release.indexer is not None:
+        local_indexer = "Irc" + release.indexer
+    test_suite.assertEqual(release.title, rx["title"], "Title is not matching")
+    test_suite.assertEqual(
+        release.url, rx["downloadUrl"], "Download URL is not matching"
+    )
+    test_suite.assertEqual(local_indexer, rx.get("indexer"), "Indexer is not matching")
     test_suite.assertTrue(
         get_date_diff(rx["publishDate"]) < 5, "Publish date is too old"
     )
-    test_suite.assertEqual(protocol, rx["protocol"], "Protocol is not matching")
+    test_suite.assertEqual(release.protocol, rx["protocol"], "Protocol is not matching")
 
 
 def sonarr_max_announcements(test_suite, nr):
-    for i in range(nr):
+    for _ in range(nr):
         sonarr_received()
     test_suite.assertEqual(sonarr_received(), None)
 
 
 def radarr_max_announcements(test_suite, nr):
-    for i in range(nr):
+    for _ in range(nr):
         radarr_received()
     test_suite.assertEqual(radarr_received(), None)
 
 
 def lidarr_max_announcements(test_suite, nr):
-    for i in range(nr):
+    for _ in range(nr):
         lidarr_received()
     test_suite.assertEqual(lidarr_received(), None)
 

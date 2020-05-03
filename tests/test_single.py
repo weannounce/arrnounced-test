@@ -60,21 +60,13 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_sonarr_rx(
-            self,
-            "this is a name",
-            "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
-            "Single",
+            self, release,
         )
         backends.check_radarr_rx(
-            self,
-            "this is a name",
-            "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
-            "Single",
+            self, release,
         )
         backends.check_lidarr_rx(
-            self,
-            "this is a name",
-            "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
+            self, release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -104,10 +96,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_sonarr_rx(
-            self,
-            "son snatch",
-            "animal: dog &mood=sad f1: first_fixed f2: fixed_second",
-            "Single",
+            self, release,
         )
 
         backends.radarr_max_announcements(self, 1)
@@ -140,10 +129,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_radarr_rx(
-            self,
-            "rad snatch",
-            "animal: cat &mood=happy f1: first_fixed f2: fixed_second",
-            "Single",
+            self, release,
         )
 
         backends.sonarr_max_announcements(self, 1)
@@ -176,9 +162,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_lidarr_rx(
-            self,
-            "lid snatch",
-            "animal: rat &mood=curios f1: first_fixed f2: fixed_second",
+            self, release,
         )
 
         backends.radarr_max_announcements(self, 1)
@@ -211,10 +195,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_sonarr_rx(
-            self,
-            "son snatch2",
-            "animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
-            "Single",
+            self, release,
         )
 
         backends.radarr_max_announcements(self, 1)
@@ -239,10 +220,7 @@ class SingleTest(unittest.TestCase):
         web.renotify(self, db.get_announce_id(), "Radarr")
 
         backends.check_radarr_rx(
-            self,
-            "son snatch2",
-            "animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
-            "Single",
+            self, release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)

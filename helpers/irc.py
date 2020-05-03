@@ -2,8 +2,9 @@ import asyncio
 import pydle
 import socket
 import time
-from . import config
 import threading
+from datetime import datetime
+from . import config
 
 expected_channels = []
 expected_users = []
@@ -27,6 +28,7 @@ def announce(release):
     asyncio.run_coroutine_threadsafe(
         client.send_message(release.channel, release.messages.pop(0)), event_loop
     )
+    release.announce_time = datetime.now()
     time.sleep(2)
 
 

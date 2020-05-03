@@ -64,21 +64,13 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_sonarr_rx(
-            self,
-            "multi title",
-            "http://example/dl.php/12345/config_string/multi+title.jpg",
-            "Multi",
+            self, release,
         )
         backends.check_radarr_rx(
-            self,
-            "multi title",
-            "http://example/dl.php/12345/config_string/multi+title.jpg",
-            "Multi",
+            self, release,
         )
         backends.check_lidarr_rx(
-            self,
-            "multi title",
-            "http://example/dl.php/12345/config_string/multi+title.jpg",
+            self, release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -114,10 +106,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_sonarr_rx(
-            self,
-            "second multi",
-            "http://example/dl.php/54321/config_string/second+multi.jpg",
-            "Multi",
+            self, release,
         )
         backends.radarr_max_announcements(self, 0)
         backends.lidarr_max_announcements(self, 0)
@@ -152,7 +141,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_radarr_rx(
-            self, "third", "http://ex/dl.php/99/config_string/third.jpg", "Multi"
+            self, release,
         )
         backends.radarr_max_announcements(self, 0)
         backends.lidarr_max_announcements(self, 0)
@@ -174,7 +163,7 @@ class SingleTest(unittest.TestCase):
         web.renotify(self, db.get_announce_id(), "Lidarr")
 
         backends.check_lidarr_rx(
-            self, "third", "http://ex/dl.php/99/config_string/third.jpg"
+            self, release,
         )
         backends.sonarr_max_announcements(self, 0)
         backends.radarr_max_announcements(self, 0)
