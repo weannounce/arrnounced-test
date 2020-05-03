@@ -19,7 +19,7 @@ def renotify(test_suite, table_row, backend):
     renotify_link.click()
 
 
-def check_announced(test_suite, title, indexer, backends, snatched_backends=[]):
+def check_announced(test_suite, release):
     _get_main()
     table_rows = (
         browser.find_element_by_id("announced_torrents")
@@ -32,21 +32,21 @@ def check_announced(test_suite, title, indexer, backends, snatched_backends=[]):
 
     cells = row.find_elements_by_tag_name("td")
     test_suite.assertEqual(len(cells), 5)
-    test_suite.assertEqual(cells[1].text, indexer)
-    test_suite.assertEqual(cells[2].text, title)
+    test_suite.assertEqual(cells[1].text, release.indexer)
+    test_suite.assertEqual(cells[2].text, release.title)
 
     web_backends = cells[3].text.split("/")
     test_suite.assertEqual(
-        len(web_backends), len(backends), "Backends length does not match"
+        len(web_backends), len(release.backends), "Backends length does not match"
     )
     for backend in web_backends:
-        test_suite.assertTrue(backend in backends)
+        test_suite.assertTrue(backend in release.backends)
 
-    if len(snatched_backends) > 0:
-        _check_snatch(test_suite, title, indexer, snatched_backends[0])
+    if len(release.snatches) > 0:
+        _check_snatch(test_suite, release)
 
 
-def _check_snatch(test_suite, title, indexer, snatched_backend):
+def _check_snatch(test_suite, release):
     table_rows = (
         browser.find_element_by_id("snatched_torrents")
         .find_element_by_tag_name("tbody")
@@ -58,9 +58,9 @@ def _check_snatch(test_suite, title, indexer, snatched_backend):
 
     cells = row.find_elements_by_tag_name("td")
     test_suite.assertEqual(len(cells), 4)
-    test_suite.assertEqual(cells[1].text, indexer)
-    test_suite.assertEqual(cells[2].text, title)
-    test_suite.assertEqual(cells[3].text, snatched_backend)
+    test_suite.assertEqual(cells[1].text, release.indexer)
+    test_suite.assertEqual(cells[2].text, release.title)
+    test_suite.assertEqual(cells[3].text, release.snatches[0])
 
 
 def _get_main():

@@ -77,11 +77,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self,
-            "multi title",
-            "http://example/dl.php/12345/config_string/multi+title.jpg",
-            "Multi",
-            ["Sonarr", "Radarr", "Lidarr"],
+            self, release,
         )
 
     def test_sonarr_snatch(self):
@@ -115,12 +111,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self,
-            "second multi",
-            "http://example/dl.php/54321/config_string/second+multi.jpg",
-            "Multi",
-            ["Sonarr"],
-            ["Sonarr"],
+            self, release,
         )
 
     def test_renotify_lidarr(self):
@@ -150,17 +141,14 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self,
-            "third",
-            "http://ex/dl.php/99/config_string/third.jpg",
-            "Multi",
-            ["Radarr"],
-            ["Radarr"],
+            self, release,
         )
 
         backends.lidarr_send_approved(True)
         web.login()
         web.renotify(self, db.get_announce_id(), "Lidarr")
+
+        release.snatches.append("Lidarr")
 
         backends.check_lidarr_rx(
             self, release,
@@ -172,10 +160,5 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 2)
 
         db.check_announced(
-            self,
-            "third",
-            "http://ex/dl.php/99/config_string/third.jpg",
-            "Multi",
-            ["Radarr"],
-            ["Radarr", "Lidarr"],
+            self, release,
         )

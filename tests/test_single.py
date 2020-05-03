@@ -73,11 +73,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self,
-            "this is a name",
-            "animal: cow &mood=angry f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
+            self, release,
         )
 
     def test_sonarr_snatch(self):
@@ -105,12 +101,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self,
-            "son snatch",
-            "animal: dog &mood=sad f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
-            ["Sonarr"],
+            self, release,
         )
 
     def test_radarr_snatch(self):
@@ -138,12 +129,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self,
-            "rad snatch",
-            "animal: cat &mood=happy f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
-            ["Radarr"],
+            self, release,
         )
 
     def test_lidarr_snatch(self):
@@ -171,12 +157,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self,
-            "lid snatch",
-            "animal: rat &mood=curios f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
-            ["Lidarr"],
+            self, release,
         )
 
     def test_renotify_radarr(self):
@@ -204,12 +185,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self,
-            "son snatch2",
-            "animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
-            ["Sonarr"],
+            self, release,
         )
 
         backends.radarr_send_approved(True)
@@ -219,6 +195,8 @@ class SingleTest(unittest.TestCase):
         web.renotify(self, db.get_announce_id(), "Lidarr")
         web.renotify(self, db.get_announce_id(), "Radarr")
 
+        release.snatches.append("Radarr")
+
         backends.check_radarr_rx(
             self, release,
         )
@@ -227,12 +205,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 2)
 
         db.check_announced(
-            self,
-            "son snatch2",
-            "animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
-            ["Sonarr", "Radarr"],
+            self, release,
         )
 
     def test_renotify_nonexistant(self):
@@ -254,11 +227,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self,
-            "title",
-            "animal: some &mood=thing f1: first_fixed f2: fixed_second",
-            "Single",
-            ["Sonarr", "Radarr", "Lidarr"],
+            self, release,
         )
 
         web.login()

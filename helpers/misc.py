@@ -23,9 +23,9 @@ class Release:
         self.protocol = protocol
 
 
-def check_announced(test_suite, title, dl_url, indexer, backends, snatched_backends=[]):
+def check_announced(test_suite, release):
     db.check_announced(
-        test_suite, title, dl_url, indexer, backends, snatched_backends,
+        test_suite, release,
     )
 
-    browser.check_announced(test_suite, title, indexer, backends, snatched_backends)
+    browser.check_announced(test_suite, release)
