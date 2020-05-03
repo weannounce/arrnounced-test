@@ -6,6 +6,19 @@ from selenium.webdriver.common.keys import Keys
 browser = None
 
 
+def renotify(test_suite, table_row, backend):
+    _get_main()
+    action_div = browser.find_element_by_xpath(
+        "//*[@id='announced_torrents']/table/tbody/tr[{}]/td[5]/div".format(table_row)
+    )
+    dropdown = action_div.find_element_by_xpath("a")
+    dropdown.click()
+    renotify_link = action_div.find_element_by_xpath(
+        "ul/li/a[text()='{}']".format(backend)
+    )
+    renotify_link.click()
+
+
 def check_announced(test_suite, title, indexer, backends, snatched_backends=[]):
     _get_main()
     table_rows = (
