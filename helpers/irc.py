@@ -21,10 +21,12 @@ def notify_if_ready():
         ready_event.set()
 
 
-def announce(channel, message):
+def announce(release):
     global client
     global event_loop
-    asyncio.run_coroutine_threadsafe(client.send_message(channel, message), event_loop)
+    asyncio.run_coroutine_threadsafe(
+        client.send_message(release.channel, release.messages.pop(0)), event_loop
+    )
     time.sleep(2)
 
 

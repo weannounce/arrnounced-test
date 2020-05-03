@@ -1,5 +1,6 @@
 import unittest
 from helpers import db, irc, backends, web, browser, misc
+from helpers.misc import Release
 from threading import Thread
 
 channel = "#multi"
@@ -33,21 +34,34 @@ class SingleTest(unittest.TestCase):
         web.logout()
 
     def test_no_snatch(self):
-        irc.announce(channel, "Old: multi title")
+        release = Release(
+            messages=[
+                "Old: multi title",
+                "Category: color tree fruit",
+                "PATH: https://example/f?id=12345",
+            ],
+            channel=channel,
+            title="multi title",
+            url="http://example/dl.php/12345/config_string/multi+title.jpg",
+            indexer="Multi",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        irc.announce(release)
         backends.sonarr_max_announcements(self, 0)
         backends.radarr_max_announcements(self, 0)
         backends.lidarr_max_announcements(self, 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
-        irc.announce(channel, "Category: color tree fruit")
+        irc.announce(release)
         backends.sonarr_max_announcements(self, 0)
         backends.radarr_max_announcements(self, 0)
         backends.lidarr_max_announcements(self, 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
-        irc.announce(channel, "PATH: https://example/f?id=12345")
+        irc.announce(release)
 
         backends.check_sonarr_rx(
             self,
@@ -79,11 +93,25 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_sonarr_snatch(self):
+        release = Release(
+            messages=[
+                "Old: second multi ",
+                "Category: color",
+                "PATH: https://example/a?id=54321",
+            ],
+            channel=channel,
+            title="second multi",
+            url="http://example/dl.php/54321/config_string/second+multi.jpg",
+            indexer="Multi",
+            backends=["Sonarr"],
+            snatches=["Sonarr"],
+        )
+
         backends.sonarr_send_approved(True)
 
-        irc.announce(channel, "Old: second multi ")
-        irc.announce(channel, "Category: color")
-        irc.announce(channel, "PATH: https://example/a?id=54321")
+        irc.announce(release)
+        irc.announce(release)
+        irc.announce(release)
 
         backends.check_sonarr_rx(
             self,
@@ -107,11 +135,21 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_renotify_lidarr(self):
+        release = Release(
+            messages=["Old: third ", "Category: fruit", "PATH: https://ex/a?id=99"],
+            channel=channel,
+            title="third",
+            url="http://ex/dl.php/99/config_string/third.jpg",
+            indexer="Multi",
+            backends=["Radarr"],
+            snatches=["Radarr"],
+        )
+
         backends.radarr_send_approved(True)
 
-        irc.announce(channel, "Old: third ")
-        irc.announce(channel, "Category: fruit")
-        irc.announce(channel, "PATH: https://ex/a?id=99")
+        irc.announce(release)
+        irc.announce(release)
+        irc.announce(release)
 
         backends.check_radarr_rx(
             self, "third", "http://ex/dl.php/99/config_string/third.jpg", "Multi"

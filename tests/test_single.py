@@ -1,5 +1,6 @@
 import unittest
 from helpers import db, irc, backends, web, browser, misc
+from helpers.misc import Release
 from threading import Thread
 
 channel = "#single"
@@ -33,9 +34,12 @@ class SingleTest(unittest.TestCase):
         web.logout()
 
     def test_no_match(self):
-        irc.announce(
-            channel, "this is a name  -  cow/ ¤/(- #angry#  -  pasta and sauce"
+        release = Release(
+            messages=["this is a name  -  cow/ ¤/(- #angry#  -  pasta and sauce"],
+            channel=channel,
         )
+
+        irc.announce(release)
 
         backends.sonarr_max_announcements(self, 0)
         backends.radarr_max_announcements(self, 0)
@@ -44,9 +48,16 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
     def test_no_snatch(self):
-        irc.announce(
-            channel, "this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce"
+        release = Release(
+            messages=["this is a name  -  /cow/ ¤/(- #angry#  -  pasta and sauce"],
+            channel=channel,
+            title="this is a name",
+            url="animal: cow &mood=angry f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
         )
+
+        irc.announce(release)
 
         backends.check_sonarr_rx(
             self,
@@ -78,9 +89,19 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_sonarr_snatch(self):
+        release = Release(
+            messages=["son snatch  -  /dog/ ¤/(- #sad#  -  pasta"],
+            channel=channel,
+            title="son snatch",
+            url="animal: dog &mood=sad f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+            snatches=["Sonarr"],
+        )
+
         backends.sonarr_send_approved(True)
 
-        irc.announce(channel, "son snatch  -  /dog/ ¤/(- #sad#  -  pasta")
+        irc.announce(release)
 
         backends.check_sonarr_rx(
             self,
@@ -104,9 +125,19 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_radarr_snatch(self):
+        release = Release(
+            messages=["rad snatch  -  /cat/ ¤/(- #happy#  -  pasta"],
+            channel=channel,
+            title="rad snatch",
+            url="animal: cat &mood=happy f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+            snatches=["Radarr"],
+        )
+
         backends.radarr_send_approved(True)
 
-        irc.announce(channel, "rad snatch  -  /cat/ ¤/(- #happy#  -  pasta")
+        irc.announce(release)
 
         backends.check_radarr_rx(
             self,
@@ -130,9 +161,19 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_lidarr_snatch(self):
+        release = Release(
+            messages=["lid snatch  -  /rat/ ¤/(- #curios#  -  pasta"],
+            channel=channel,
+            title="lid snatch",
+            url="animal: rat &mood=curios f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+            snatches=["Lidarr"],
+        )
+
         backends.lidarr_send_approved(True)
 
-        irc.announce(channel, "lid snatch  -  /rat/ ¤/(- #curios#  -  pasta")
+        irc.announce(release)
 
         backends.check_lidarr_rx(
             self,
@@ -155,9 +196,19 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_renotify_radarr(self):
+        release = Release(
+            messages=["son snatch2  -  /horsie/ ¤/(- #calm#  -  pasta"],
+            channel=channel,
+            title="son snatch2",
+            url="animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+            snatches=["Sonarr"],
+        )
+
         backends.sonarr_send_approved(True)
 
-        irc.announce(channel, "son snatch2  -  /horsie/ ¤/(- #calm#  -  pasta")
+        irc.announce(release)
 
         backends.check_sonarr_rx(
             self,
@@ -207,7 +258,16 @@ class SingleTest(unittest.TestCase):
         )
 
     def test_renotify_nonexistant(self):
-        irc.announce(channel, "title  -  /some/ ¤/(- #thing#  -  pasta")
+        release = Release(
+            messages=["title  -  /some/ ¤/(- #thing#  -  pasta"],
+            channel=channel,
+            title="title",
+            url="animal: some &mood=thing f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        irc.announce(release)
 
         backends.sonarr_max_announcements(self, 1)
         backends.radarr_max_announcements(self, 1)
