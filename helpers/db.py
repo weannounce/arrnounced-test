@@ -41,8 +41,8 @@ def clear_db():
     Snatched.select().delete()
 
 
-def get_date_diff(date):
-    return (datetime.now() - date).total_seconds()
+def get_time_diff(release, db_time):
+    return abs((release.announce_time - db_time).total_seconds())
 
 
 @db_session
@@ -52,7 +52,7 @@ def check_announced(test_suite, release):
     announcement = announcements[0]
 
     test_suite.assertTrue(
-        get_date_diff(announcement.date) < 5, "Publish date is too old"
+        get_time_diff(release, announcement.date) < 1, "Publish date is too old"
     )
     test_suite.assertEqual(release.title, announcement.title, "Title is not matching")
     test_suite.assertEqual(

@@ -34,10 +34,9 @@ backends = {
 }
 
 
-def get_date_diff(publish_date):
-    now = datetime.now()
+def get_date_diff(release, publish_date):
     dt = datetime.strptime(publish_date, "%Y-%m-%dT%H:%M:%S.%f")
-    return (now - dt).total_seconds()
+    return abs((release.announce_time - dt).total_seconds())
 
 
 def check_sonarr_rx(test_suite, release):
@@ -68,7 +67,7 @@ def _check_rx(rx_list, test_suite, release):
     )
     test_suite.assertEqual(local_indexer, rx.get("indexer"), "Indexer is not matching")
     test_suite.assertTrue(
-        get_date_diff(rx["publishDate"]) < 5, "Publish date is too old"
+        get_date_diff(release, rx["publishDate"]) < 1, "Publish date is too old"
     )
     test_suite.assertEqual(release.protocol, rx["protocol"], "Protocol is not matching")
 
