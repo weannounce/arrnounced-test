@@ -190,10 +190,9 @@ class SingleTest(unittest.TestCase):
 
         backends.radarr_send_approved(True)
 
-        web.login()
-        web.renotify(self, db.get_announce_id(), "Sonarr")
-        web.renotify(self, db.get_announce_id(), "Lidarr")
-        web.renotify(self, db.get_announce_id(), "Radarr")
+        browser.renotify(self, table_row=1, backend="Sonarr", success=False)
+        browser.renotify(self, table_row=1, backend="Lidarr", success=False)
+        browser.renotify(self, table_row=1, backend="Radarr", success=True)
 
         release.snatches.append("Radarr")
 
@@ -231,7 +230,7 @@ class SingleTest(unittest.TestCase):
         )
 
         web.login()
-        web.renotify(self, db.get_announce_id(), "NonExistant")
+        web.renotify(self, db.get_announcement(), "NonExistant")
 
         backends.sonarr_max_announcements(self, 1)
         backends.radarr_max_announcements(self, 1)

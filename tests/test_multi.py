@@ -145,16 +145,17 @@ class SingleTest(unittest.TestCase):
         )
 
         backends.lidarr_send_approved(True)
-        web.login()
-        web.renotify(self, db.get_announce_id(), "Lidarr")
+        browser.renotify(self, table_row=1, backend="Sonarr", success=False)
+        browser.renotify(self, table_row=1, backend="Radarr", success=False)
+        browser.renotify(self, table_row=1, backend="Lidarr", success=True)
 
         release.snatches.append("Lidarr")
 
         backends.check_lidarr_rx(
             self, release,
         )
-        backends.sonarr_max_announcements(self, 0)
-        backends.radarr_max_announcements(self, 0)
+        backends.sonarr_max_announcements(self, 1)
+        backends.radarr_max_announcements(self, 1)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 2)

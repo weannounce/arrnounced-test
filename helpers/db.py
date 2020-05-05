@@ -81,7 +81,7 @@ def check_announced(test_suite, release):
 
 
 @db_session
-def get_announce_id(index=0):
+def get_announcement(index=0):
     return Announced.select().order_by(desc(Announced.id)).limit(1, offset=index)[0]
 
 

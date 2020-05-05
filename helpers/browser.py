@@ -2,11 +2,12 @@ from . import config
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
+import time
 
 browser = None
 
 
-def renotify(test_suite, table_row, backend):
+def renotify(test_suite, table_row, backend, success):
     _get_main()
     action_div = browser.find_element_by_xpath(
         "//*[@id='announced_torrents']/table/tbody/tr[{}]/td[5]/div".format(table_row)
@@ -17,6 +18,30 @@ def renotify(test_suite, table_row, backend):
         "ul/li/a[text()='{}']".format(backend)
     )
     renotify_link.click()
+
+    _check_toastr(test_suite, backend, success)
+
+
+def _check_toastr(test_suite, backend, success):
+    if success:
+        class_name = "toast-success"
+        toastr_text = " approved the torrent this time!"
+    else:
+        class_name = "toast-error"
+        toastr_text = " still declined this torrent..."
+
+    toastr = browser.find_element_by_id("toast-container").find_element_by_class_name(
+        class_name
+    )
+
+    test_suite.assertEqual(
+        toastr.text, backend + toastr_text, "Toastr text not ok",
+    )
+
+    time.sleep(7)
+
+    toasters = browser.find_elements_by_id("toast-container")
+    test_suite.assertEqual(len(toasters), 0, "Toaster should be expired")
 
 
 def check_announced(test_suite, release):
