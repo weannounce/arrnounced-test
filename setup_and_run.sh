@@ -38,7 +38,7 @@ then
   trap "docker stop $container_name"  EXIT
 else
   echo "Running from source..."
-  ../arrnounced/src/arrnounced.py -v -c test_settings.cfg -d data -t trackers &
+  ../arrnounced/src/arrnounced.py -v -c data/settings.cfg -d data -t trackers &
   trap 'kill %1' EXIT
 fi
 
