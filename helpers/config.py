@@ -8,3 +8,5 @@ db_path = "./data"
 arrnounced_port = 3467
 web_username = "admin"
 web_password = "password"
+
+docker = None

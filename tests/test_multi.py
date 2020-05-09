@@ -1,7 +1,6 @@
 import unittest
 from helpers import db, irc, backends, web, browser, misc
 from helpers.misc import Release
-from threading import Thread
 
 channel = "#multi"
 
@@ -9,21 +8,11 @@ channel = "#multi"
 class SingleTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        self.irc_thread = Thread(target=irc.run)
-        self.irc_thread.start()
-        backends.run()
-        db.init()
-        browser.init()
-        irc.ready_event.wait()
+        misc.setUpClass()
 
     @classmethod
     def tearDownClass(self):
-        irc.stop()
-        backends.stop()
-        db.stop()
-        browser.stop()
-        self.irc_thread.join()
-        irc.ready_event.clear()
+        misc.tearDownClass()
 
     @db.db_session
     def setUp(self):

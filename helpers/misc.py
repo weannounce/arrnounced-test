@@ -1,4 +1,5 @@
-from helpers import db, browser
+from helpers import db, irc, backends, browser, arrnounced
+from threading import Thread
 
 
 class Release:
@@ -29,3 +30,30 @@ def check_announced(test_suite, release):
     )
 
     browser.check_announced(test_suite, release)
+
+
+irc_thread = None
+
+
+def setUpClass():
+    global irc_thread
+    irc_thread = Thread(target=irc.run)
+    irc_thread.start()
+    arrnounced.run()
+    backends.run()
+    db.init()
+    irc.ready_event.wait()
+
+    # Browser performs login, wait for everything to start before.
+    browser.init()
+
+
+def tearDownClass():
+    global irc_thread
+    irc.stop()
+    backends.stop()
+    db.stop()
+    browser.stop()
+    irc_thread.join()
+    irc.ready_event.clear()
+    arrnounced.stop()
