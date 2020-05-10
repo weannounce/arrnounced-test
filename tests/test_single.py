@@ -63,7 +63,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
     def test_sonarr_snatch(self):
@@ -91,7 +91,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
     def test_radarr_snatch(self):
@@ -119,7 +119,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
     def test_lidarr_snatch(self):
@@ -147,7 +147,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
     def test_renotify_radarr(self):
@@ -175,14 +175,14 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
         backends.radarr_send_approved(True)
 
-        browser.renotify(self, table_row=1, backend="Sonarr", success=False)
-        browser.renotify(self, table_row=1, backend="Lidarr", success=False)
-        browser.renotify(self, table_row=1, backend="Radarr", success=True)
+        browser.renotify(self, config, table_row=1, backend="Sonarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="Lidarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="Radarr", success=True)
 
         release.snatches.append("Radarr")
 
@@ -216,11 +216,11 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
-        web.login()
-        web.renotify(self, db.get_announcement(), "NonExistant")
+        web.login(config)
+        web.renotify(self, config, db.get_announcement(), "NonExistant")
 
         backends.sonarr_max_announcements(self, 1)
         backends.radarr_max_announcements(self, 1)

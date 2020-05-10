@@ -4,7 +4,7 @@ import socket
 import time
 import threading
 from datetime import datetime
-from . import config
+from . import config as global_config
 
 expected_channels = []
 expected_users = []
@@ -56,7 +56,7 @@ class IRC(BotBase):
 
     async def on_join(self, channel, user):
         await super().on_join(channel, user)
-        if user == config.irc_nickname:
+        if user == global_config.irc_nickname:
             if channel in expected_channels:
                 expected_channels.remove(channel)
         else:
@@ -92,15 +92,15 @@ def run():
     global expected_channels
     global expected_users
 
-    expected_channels = config.irc_channels.split(",")
-    expected_users = config.irc_users
+    expected_channels = global_config.irc_channels.split(",")
+    expected_users = global_config.irc_users
 
     event_loop = asyncio.new_event_loop()
     irc_task = get_irc_task(
-        config.irc_nickname,
-        config.irc_channels,
-        config.irc_server,
-        config.irc_port,
+        global_config.irc_nickname,
+        global_config.irc_channels,
+        global_config.irc_server,
+        global_config.irc_port,
         event_loop,
     )
 

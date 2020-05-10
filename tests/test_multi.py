@@ -67,7 +67,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
     def test_sonarr_snatch(self):
@@ -101,7 +101,7 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
     def test_renotify_lidarr(self):
@@ -131,13 +131,13 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, release,
+            self, config, release,
         )
 
         backends.lidarr_send_approved(True)
-        browser.renotify(self, table_row=1, backend="Sonarr", success=False)
-        browser.renotify(self, table_row=1, backend="Radarr", success=False)
-        browser.renotify(self, table_row=1, backend="Lidarr", success=True)
+        browser.renotify(self, config, table_row=1, backend="Sonarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="Radarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="Lidarr", success=True)
 
         release.snatches.append("Lidarr")
 

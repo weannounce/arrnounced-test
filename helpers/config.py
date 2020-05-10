@@ -5,7 +5,6 @@ irc_port = 6667
 
 irc_users = ["bipbopiambot", "bipbopimalsobot"]
 db_path = "./data"
-arrnounced_port = 3467
 web_username = "admin"
 web_password = "password"
 

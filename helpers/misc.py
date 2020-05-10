@@ -3,9 +3,10 @@ from threading import Thread
 
 
 class Config:
-    def __init__(self, config_file, channels):
+    def __init__(self, config_file, channels, web_port=3467):
         self.config_file = config_file
         self.channels = channels
+        self.web_port = web_port
 
 
 class Release:
@@ -30,12 +31,12 @@ class Release:
         self.protocol = protocol
 
 
-def check_announced(test_suite, release):
+def check_announced(test_suite, config, release):
     db.check_announced(
         test_suite, release,
     )
 
-    browser.check_announced(test_suite, release)
+    browser.check_announced(test_suite, config, release)
 
 
 irc_thread = None
@@ -51,7 +52,7 @@ def setUpClass(config):
     irc.ready_event.wait()
 
     # Browser performs login, wait for everything to start before.
-    browser.init()
+    browser.init(config)
 
 
 def tearDownClass():

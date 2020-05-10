@@ -1,7 +1,7 @@
 from pony.orm import Database, desc, Required, Set
 from pony.orm import db_session  # noqa: F401
 import os
-from . import config
+from . import config as global_config
 from datetime import datetime
 
 db = Database()
@@ -25,7 +25,7 @@ class Snatched(db.Entity):
 def init():
     db.bind(
         "sqlite",
-        os.path.join(os.path.realpath(config.db_path), "brain.db"),
+        os.path.join(os.path.realpath(global_config.db_path), "brain.db"),
         create_db=False,
     )
     db.generate_mapping(create_tables=False)

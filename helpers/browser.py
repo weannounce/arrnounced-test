@@ -1,4 +1,4 @@
-from . import config
+from . import config as global_config
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -7,8 +7,8 @@ import time
 browser = None
 
 
-def renotify(test_suite, table_row, backend, success):
-    _get_main()
+def renotify(test_suite, config, table_row, backend, success):
+    _get_main(config)
     action_div = browser.find_element_by_xpath(
         "//*[@id='announced_torrents']/table/tbody/tr[{}]/td[5]/div".format(table_row)
     )
@@ -45,8 +45,8 @@ def _check_toastr(test_suite, backend, success):
     test_suite.assertEqual(len(toasters), 0, "Toaster should be expired")
 
 
-def check_announced(test_suite, release):
-    _get_main()
+def check_announced(test_suite, config, release):
+    _get_main(config)
     table_rows = (
         browser.find_element_by_id("announced_torrents")
         .find_element_by_tag_name("tbody")
@@ -89,20 +89,22 @@ def _check_snatch(test_suite, release):
     test_suite.assertEqual(cells[3].text, release.snatches[0])
 
 
-def _get_main():
+def _get_main(config):
     global browser
-    browser.get("http://localhost:" + str(config.arrnounced_port))
+    browser.get("http://localhost:" + str(config.web_port))
 
 
-def init():
+def init(config):
     global browser
     opts = Options()
     opts.headless = True
 
     browser = Firefox(options=opts)
-    _get_main()
-    browser.find_element_by_name("username").send_keys(config.web_username)
-    browser.find_element_by_name("password").send_keys(config.web_password + Keys.ENTER)
+    _get_main(config)
+    browser.find_element_by_name("username").send_keys(global_config.web_username)
+    browser.find_element_by_name("password").send_keys(
+        global_config.web_password + Keys.ENTER
+    )
     # browser.save_screenshot("login1.png")
 
 
