@@ -29,12 +29,10 @@ def announce(release):
         client.send_message(release.channel, release.messages.pop(0)), event_loop
     )
     release.announce_time = datetime.now()
-    time.sleep(2)
+    time.sleep(0.5)
 
 
 class IRC(BotBase):
-    # RECONNECT_MAX_ATTEMPTS = None
-
     def __init__(self, nickname, channel, event_loop):
         super().__init__(nickname, eventloop=event_loop)
         self.nickname = nickname

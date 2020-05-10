@@ -7,9 +7,9 @@ class Config:
         self,
         config_file,
         irc_channels,
-        web_username,
-        web_password,
         irc_users,
+        web_username=None,
+        web_password=None,
         web_port=3467,
     ):
         self.config_file = config_file

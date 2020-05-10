@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<trackerinfo
+	type="delay"
+	shortName="Delay"
+	longName="Delayed Announcement"
+	siteName="NA">
+
+	<settings>
+	</settings>
+
+	<servers>
+		<server
+			network="NA"
+			serverNames="NA"
+			channelNames="#delay"
+			announcerNames="arrtstprvidr"
+			/>
+	</servers>
+
+	<parseinfo>
+		<linepatterns>
+			<extract>
+        <regex value="^(.*)\s-\s(.*)$"/>
+				<vars>
+					<var name="torrentName"/>
+					<var name="$stuff"/>
+				</vars>
+			</extract>
+		</linepatterns>
+		<linematched>
+			<var name="torrentUrl">
+				<string value="stuff: "/>
+				<var name="$stuff"/>
+			</var>
+		</linematched>
+		<ignore>
+		</ignore>
+	</parseinfo>
+</trackerinfo>
