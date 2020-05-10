@@ -19,6 +19,7 @@ def renotify(test_suite, table_row, backend, success):
     )
     renotify_link.click()
 
+    time.sleep(0.5)
     _check_toastr(test_suite, backend, success)
 
 
