@@ -87,18 +87,18 @@ def get_irc_task(nickname, channel, server, port, event_loop):
     return client.connect(hostname=server, port=port)
 
 
-def run():
+def run(config):
     global event_loop
     global expected_channels
     global expected_users
 
-    expected_channels = global_config.irc_channels.split(",")
-    expected_users = global_config.irc_users
+    expected_channels = config.irc_channels
+    expected_users = config.irc_users
 
     event_loop = asyncio.new_event_loop()
     irc_task = get_irc_task(
         global_config.irc_nickname,
-        global_config.irc_channels,
+        ",".join(config.irc_channels),
         global_config.irc_server,
         global_config.irc_port,
         event_loop,

@@ -4,13 +4,20 @@ from threading import Thread
 
 class Config:
     def __init__(
-        self, config_file, channels, web_username, web_password, web_port=3467
+        self,
+        config_file,
+        irc_channels,
+        web_username,
+        web_password,
+        irc_users,
+        web_port=3467,
     ):
         self.config_file = config_file
-        self.channels = channels
+        self.irc_channels = irc_channels
         self.web_port = web_port
         self.web_username = web_username
         self.web_password = web_password
+        self.irc_users = irc_users
 
 
 class Release:
@@ -48,7 +55,7 @@ irc_thread = None
 
 def setUpClass(config):
     global irc_thread
-    irc_thread = Thread(target=irc.run)
+    irc_thread = Thread(target=irc.run, args=[config])
     irc_thread.start()
     arrnounced.run(config)
     backends.run()

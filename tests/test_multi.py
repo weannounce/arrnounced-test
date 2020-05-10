@@ -5,9 +5,10 @@ from helpers.misc import Release
 channel = "#multi"
 config = misc.Config(
     config_file="single_multi.cfg",
-    channels=[channel],
     web_username="admin",
     web_password="password",
+    irc_channels=[channel],
+    irc_users=["bipbopimalsobot"],
 )
 
 
