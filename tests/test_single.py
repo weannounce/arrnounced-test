@@ -193,8 +193,8 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 2)
 
-        db.check_announced(
-            self, release,
+        misc.check_announced(
+            self, config, release,
         )
 
     def test_renotify_nonexistant(self):

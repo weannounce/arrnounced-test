@@ -86,7 +86,7 @@ def _check_snatch(test_suite, release):
     test_suite.assertEqual(len(cells), 4)
     test_suite.assertEqual(cells[1].text, release.indexer)
     test_suite.assertEqual(cells[2].text, release.title)
-    test_suite.assertEqual(cells[3].text, release.snatches[0])
+    test_suite.assertEqual(cells[3].text, release.snatches[-1])
 
 
 def _get_main(config):
