@@ -2,6 +2,12 @@ from helpers import db, irc, backends, browser, arrnounced
 from threading import Thread
 
 
+class Config:
+    def __init__(self, config_file, channels):
+        self.config_file = config_file
+        self.channels = channels
+
+
 class Release:
     def __init__(
         self,
@@ -35,11 +41,11 @@ def check_announced(test_suite, release):
 irc_thread = None
 
 
-def setUpClass():
+def setUpClass(config):
     global irc_thread
     irc_thread = Thread(target=irc.run)
     irc_thread.start()
-    arrnounced.run()
+    arrnounced.run(config)
     backends.run()
     db.init()
     irc.ready_event.wait()

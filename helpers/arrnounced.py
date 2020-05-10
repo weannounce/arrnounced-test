@@ -1,7 +1,7 @@
 import requests
 import subprocess
 import os
-from helpers import config
+from helpers import config as global_config
 
 container_name = "arrnounced_test"
 current_directory = os.getcwd()
@@ -16,7 +16,7 @@ def stop():
 
     if requests.get("http://localhost:3467/shutdown").status_code != 200:
         print("Failed to shutdown Arrnounced. Killing instead!")
-        if config.docker is None:
+        if global_config.docker is None:
             arr_process.kill()
         else:
             subprocess.Popen(["docker", "container", "stop", container_name]).wait()
@@ -24,9 +24,9 @@ def stop():
         arr_process.wait()
 
 
-def run():
+def run(config):
     global arr_process
-    if config.docker is None:
+    if global_config.docker is None:
         print("Starting Arrnounced from source")
         arr_process = subprocess.Popen(
             [
@@ -38,7 +38,7 @@ def run():
                 "../arrnounced/src/arrnounced.py",
                 "-v",
                 "-c",
-                "data/settings.cfg",
+                "configs/" + config.config_file,
                 "-d",
                 "data",
                 "-t",
@@ -60,11 +60,16 @@ def run():
                 "-v",
                 current_directory + "/data:/config",
                 "-v",
+                current_directory
+                + "/configs/"
+                + config.config_file
+                + ":/config/settings.cfg",
+                "-v",
                 current_directory + "/trackers:/trackers",
                 "-e",
                 "TZ=" + timezone,
                 "-e",
                 "VERBOSE=Y",
-                "weannounce/arrnounced:" + config.docker,
+                "weannounce/arrnounced:" + global_config.docker,
             ]
         )

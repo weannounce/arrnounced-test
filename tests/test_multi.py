@@ -3,12 +3,13 @@ from helpers import db, irc, backends, web, browser, misc
 from helpers.misc import Release
 
 channel = "#multi"
+config = misc.Config(config_file="single_multi.cfg", channels=[channel])
 
 
 class SingleTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
-        misc.setUpClass()
+        misc.setUpClass(config)
 
     @classmethod
     def tearDownClass(self):
