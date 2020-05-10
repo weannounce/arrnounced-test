@@ -1,5 +1,4 @@
 import requests
-from . import config as global_config
 
 session = None
 
@@ -9,10 +8,7 @@ def login(config):
     session = requests.Session()
     result = session.post(
         "http://localhost:{}/login".format(config.web_port),
-        data={
-            "username": global_config.web_username,
-            "password": global_config.web_password,
-        },
+        data={"username": config.web_username, "password": config.web_password},
     )
     if result.status_code != 200:
         print("Login failed")

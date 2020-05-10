@@ -3,7 +3,12 @@ from helpers import db, irc, backends, web, browser, misc
 from helpers.misc import Release
 
 channel = "#multi"
-config = misc.Config(config_file="single_multi.cfg", channels=[channel])
+config = misc.Config(
+    config_file="single_multi.cfg",
+    channels=[channel],
+    web_username="admin",
+    web_password="password",
+)
 
 
 class SingleTest(unittest.TestCase):

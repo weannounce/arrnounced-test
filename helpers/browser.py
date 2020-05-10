@@ -1,4 +1,3 @@
-from . import config as global_config
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -101,10 +100,8 @@ def init(config):
 
     browser = Firefox(options=opts)
     _get_main(config)
-    browser.find_element_by_name("username").send_keys(global_config.web_username)
-    browser.find_element_by_name("password").send_keys(
-        global_config.web_password + Keys.ENTER
-    )
+    browser.find_element_by_name("username").send_keys(config.web_username)
+    browser.find_element_by_name("password").send_keys(config.web_password + Keys.ENTER)
     # browser.save_screenshot("login1.png")
 
 

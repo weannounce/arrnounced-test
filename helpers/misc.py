@@ -3,10 +3,14 @@ from threading import Thread
 
 
 class Config:
-    def __init__(self, config_file, channels, web_port=3467):
+    def __init__(
+        self, config_file, channels, web_username, web_password, web_port=3467
+    ):
         self.config_file = config_file
         self.channels = channels
         self.web_port = web_port
+        self.web_username = web_username
+        self.web_password = web_password
 
 
 class Release:
