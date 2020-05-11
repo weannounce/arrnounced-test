@@ -11,6 +11,9 @@ if __name__ == "__main__":
     parser.add_argument(
         "-d", "--docker", type=str, help="Run docker image", default=None,
     )
+    parser.add_argument(
+        "test", type=str, help="Which tests to run", nargs="?", default="*"
+    )
 
     try:
         args = parser.parse_args()
@@ -20,7 +23,9 @@ if __name__ == "__main__":
 
     config.docker = args.docker
 
-    suite = unittest.TestLoader().discover("tests", pattern="test_*.py")
+    suite = unittest.TestLoader().discover(
+        start_dir="tests", pattern="test_{}.py".format(args.test)
+    )
     result = unittest.TextTestRunner().run(suite)
 
     sys.exit(0 if result.wasSuccessful() else 1)
