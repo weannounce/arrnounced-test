@@ -67,6 +67,11 @@ def check_announced(test_suite, config, release):
     for backend in web_backends:
         test_suite.assertTrue(backend in release.backends)
 
+    torrent_url = cells[4].find_element_by_id("torrent_url").get_attribute("href")
+    test_suite.assertEqual(
+        torrent_url, release.url, "Browser torrent URL did not match"
+    )
+
     if len(release.snatches) > 0:
         _check_snatch(test_suite, release)
 
