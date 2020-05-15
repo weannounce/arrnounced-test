@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<trackerinfo
+	type="simple2"
+	shortName="Simple2"
+	longName="Simple2 Announcement"
+	siteName="NA">
+
+	<settings>
+	</settings>
+
+	<servers>
+		<server
+			network="NA"
+			serverNames="NA"
+			channelNames="#simple2"
+			announcerNames="arrtstprvidr"
+			/>
+	</servers>
+
+	<parseinfo>
+		<linepatterns>
+			<extract>
+        <regex value="^(.*)\s:\s(.*)$"/>
+				<vars>
+					<var name="torrentName"/>
+					<var name="$something"/>
+				</vars>
+			</extract>
+		</linepatterns>
+		<linematched>
+			<var name="torrentUrl">
+				<string value="else: "/>
+				<var name="$something"/>
+			</var>
+		</linematched>
+		<ignore>
+		</ignore>
+	</parseinfo>
+</trackerinfo>

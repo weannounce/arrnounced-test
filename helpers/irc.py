@@ -22,14 +22,14 @@ def notify_if_ready():
         ready_event.set()
 
 
-def announce(release):
+def announce(release, wait=0.5):
     global client
     global event_loop
     asyncio.run_coroutine_threadsafe(
         client.send_message(release.channel, release.messages.pop(0)), event_loop
     )
     release.announce_time = datetime.now()
-    time.sleep(0.5)
+    time.sleep(wait)
 
 
 class IRC(BotBase):

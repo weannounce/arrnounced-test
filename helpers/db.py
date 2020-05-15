@@ -45,39 +45,49 @@ def get_time_diff(release, db_time):
     return abs((release.announce_time - db_time).total_seconds())
 
 
-@db_session
 def check_announced(test_suite, release):
-    announcements = _get_announced(1)
-    test_suite.assertEqual(len(announcements), 1, "No announcement in ddatabase")
-    announcement = announcements[0]
+    check_announcements(test_suite, [release])
 
-    test_suite.assertTrue(
-        get_time_diff(release, announcement.date) < 1, "Publish date is too old"
-    )
-    test_suite.assertEqual(release.title, announcement.title, "Title is not matching")
+
+@db_session
+def check_announcements(test_suite, releases):
+    announcements = _get_announced(len(releases))
     test_suite.assertEqual(
-        release.indexer, announcement.indexer, "Indexer is not matching"
-    )
-    test_suite.assertEqual(
-        release.url, announcement.torrent, "Download URL is not matching"
+        len(announcements), len(releases), "No announcement in database"
     )
 
-    db_backends = announcement.backend.split("/")
-    test_suite.assertEqual(
-        len(db_backends), len(release.backends), "Backends length does not match"
-    )
-    for backend in release.backends:
-        test_suite.assertTrue(backend in db_backends, "Did not find expected backend")
-
-    test_suite.assertEqual(
-        len(release.snatches),
-        len(announcement.snatched),
-        "Snatched incorrect amount of times",
-    )
-    for snatch in announcement.snatched:
+    for (announcement, release) in zip(announcements, reversed(releases)):
         test_suite.assertTrue(
-            snatch.backend in release.snatches, "Did not find expected backend"
+            get_time_diff(release, announcement.date) < 1, "Publish date is too old"
         )
+        test_suite.assertEqual(
+            release.title, announcement.title, "Title is not matching"
+        )
+        test_suite.assertEqual(
+            release.indexer, announcement.indexer, "Indexer is not matching"
+        )
+        test_suite.assertEqual(
+            release.url, announcement.torrent, "Download URL is not matching"
+        )
+
+        db_backends = announcement.backend.split("/")
+        test_suite.assertEqual(
+            len(db_backends), len(release.backends), "Backends length does not match"
+        )
+        for backend in release.backends:
+            test_suite.assertTrue(
+                backend in db_backends, "Did not find expected backend"
+            )
+
+        test_suite.assertEqual(
+            len(release.snatches),
+            len(announcement.snatched),
+            "Snatched incorrect amount of times",
+        )
+        for snatch in announcement.snatched:
+            test_suite.assertTrue(
+                snatch.backend in release.snatches, "Did not find expected backend"
+            )
 
 
 @db_session
