@@ -11,7 +11,7 @@ def renotify(test_suite, config, table_row, backend, success):
     action_div = browser.find_element_by_xpath(
         "//*[@id='announced_torrents']/table/tbody/tr[{}]/td[5]/div".format(table_row)
     )
-    dropdown = action_div.find_element_by_xpath("a")
+    dropdown = action_div.find_element_by_xpath("a[@href='#']")
     dropdown.click()
     renotify_link = action_div.find_element_by_xpath(
         "ul/li/a[text()='{}']".format(backend)
