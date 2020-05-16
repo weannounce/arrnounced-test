@@ -7,6 +7,7 @@ trackers = [
     {"channel": "#simple2", "name": "Simple2", "url": "else"},
     {"channel": "#simple3", "name": "Simple3", "url": "or"},
 ]
+backens = ["Sonarr", "Radarr", "Lidarr"]
 config = misc.Config(
     config_file="pages.cfg",
     irc_channels=[t["channel"] for t in trackers],
@@ -59,8 +60,46 @@ class DelayTest(unittest.TestCase):
                 self, release,
             )
 
-        db.check_announcements(self, releases)
+        misc.check_announcements(self, config, releases, [])
 
-        # misc.check_announced(
-        #   self, config, release,
-        # )
+    def test_snatches(self):
+
+        releases = []
+        snatches = []
+        for i in range(90):
+            tracker = trackers[i % 3]
+            release = Release(
+                messages=["title {} : else {}".format(i, i)],
+                channel=tracker["channel"],
+                title="title {}".format(i),
+                url="{}: else {}".format(tracker["url"], i),
+                indexer=tracker["name"],
+                backends=["Sonarr", "Radarr", "Lidarr"],
+            )
+
+            if i % 3 == 0:
+                backends.sonarr_send_approved(True)
+                backends.sonarr_send_approved(False)
+                backends.sonarr_send_approved(False)
+                release.snatches.append("Sonarr")
+                snatches.append(release)
+            elif i % 5 == 0:
+                backends.radarr_send_approved(True)
+                backends.radarr_send_approved(False)
+                backends.radarr_send_approved(False)
+                release.snatches.append("Radarr")
+                snatches.append(release)
+            elif i % 7 == 0:
+                backends.lidarr_send_approved(True)
+                backends.lidarr_send_approved(False)
+                backends.lidarr_send_approved(False)
+                release.snatches.append("Lidarr")
+                snatches.append(release)
+            irc.announce(release, wait=0.3)
+            releases.append(release)
+
+        backends.sonarr_max_announcements(self, 100)
+        backends.radarr_max_announcements(self, 100)
+        backends.lidarr_max_announcements(self, 100)
+
+        misc.check_announcements(self, config, releases, snatches)

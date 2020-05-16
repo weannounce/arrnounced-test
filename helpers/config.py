@@ -4,4 +4,6 @@ irc_port = 6667
 
 db_path = "./data"
 
+webui_table_rows = 20
+
 docker = None

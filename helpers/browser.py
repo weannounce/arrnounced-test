@@ -3,6 +3,8 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
 import time
 
+from . import config as global_config
+
 browser = None
 
 
@@ -45,6 +47,12 @@ def _check_toastr(test_suite, backend, success):
 
 
 def check_announced(test_suite, config, release):
+    check_announcements(test_suite, config, [release])
+    if len(release.snatches) > 0:
+        check_snatches(test_suite, [release])
+
+
+def check_announcements(test_suite, config, releases):
     _get_main(config)
     table_rows = (
         browser.find_element_by_id("announced_torrents")
@@ -52,45 +60,50 @@ def check_announced(test_suite, config, release):
         .find_elements_by_tag_name("tr")
     )
 
-    test_suite.assertTrue(len(table_rows) > 0, "No announcement in web table found")
-    row = table_rows[0]
-
-    cells = row.find_elements_by_tag_name("td")
-    test_suite.assertEqual(len(cells), 5)
-    test_suite.assertEqual(cells[1].text, release.indexer)
-    test_suite.assertEqual(cells[2].text, release.title)
-
-    web_backends = cells[3].text.split("/")
-    test_suite.assertEqual(
-        len(web_backends), len(release.backends), "Backends length does not match"
-    )
-    for backend in web_backends:
-        test_suite.assertTrue(backend in release.backends)
-
-    torrent_url = cells[4].find_element_by_id("torrent_url").get_attribute("href")
-    test_suite.assertEqual(
-        torrent_url, release.url, "Browser torrent URL did not match"
+    test_suite.assertTrue(
+        len(table_rows) >= min(len(releases), global_config.webui_table_rows),
+        "No announcement in web table found",
     )
 
-    if len(release.snatches) > 0:
-        _check_snatch(test_suite, release)
+    for (row, release) in zip(
+        table_rows, list(reversed(releases))[: global_config.webui_table_rows]
+    ):
+        cells = row.find_elements_by_tag_name("td")
+        test_suite.assertEqual(len(cells), 5)
+        test_suite.assertEqual(cells[1].text, release.indexer)
+        test_suite.assertEqual(cells[2].text, release.title)
+
+        web_backends = cells[3].text.split("/")
+        test_suite.assertEqual(
+            len(web_backends), len(release.backends), "Backends length does not match"
+        )
+        for backend in web_backends:
+            test_suite.assertTrue(backend in release.backends)
+
+        torrent_url = cells[4].find_element_by_id("torrent_url").get_attribute("href")
+        test_suite.assertEqual(
+            torrent_url, release.url, "Browser torrent URL did not match"
+        )
 
 
-def _check_snatch(test_suite, release):
+def check_snatches(test_suite, releases):
     table_rows = (
         browser.find_element_by_id("snatched_torrents")
         .find_element_by_tag_name("tbody")
         .find_elements_by_tag_name("tr")
     )
 
-    test_suite.assertTrue(len(table_rows) > 0, "No announcement in web table found")
-    row = table_rows[0]
+    rows_iter = iter(table_rows)
+    for release in list(reversed(releases))[: global_config.webui_table_rows]:
+        if len(release.snatches) == 0:
+            continue
 
-    cells = row.find_elements_by_tag_name("td")
-    test_suite.assertEqual(len(cells), 4)
-    test_suite.assertEqual(cells[1].text, release.indexer)
-    test_suite.assertEqual(cells[2].text, release.title)
-    test_suite.assertEqual(cells[3].text, release.snatches[-1])
+        row = next(rows_iter)
+        cells = row.find_elements_by_tag_name("td")
+        test_suite.assertEqual(len(cells), 4)
+        test_suite.assertEqual(cells[1].text, release.indexer)
+        test_suite.assertEqual(cells[2].text, release.title)
+        test_suite.assertEqual(cells[3].text, release.snatches[-1])
 
 
 def _get_main(config):

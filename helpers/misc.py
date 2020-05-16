@@ -28,8 +28,8 @@ class Release:
         title=None,
         url=None,
         indexer=None,
-        backends=[],
-        snatches=[],
+        backends=None,
+        snatches=None,
         protocol="Torrent",
     ):
         self.messages = messages
@@ -37,8 +37,8 @@ class Release:
         self.title = title
         self.url = url
         self.indexer = indexer
-        self.backends = backends
-        self.snatches = snatches
+        self.backends = [] if backends is None else backends
+        self.snatches = [] if snatches is None else snatches
         self.protocol = protocol
 
 
@@ -48,6 +48,15 @@ def check_announced(test_suite, config, release):
     )
 
     browser.check_announced(test_suite, config, release)
+
+
+def check_announcements(test_suite, config, releases, snatches):
+    db.check_announcements(
+        test_suite, releases,
+    )
+
+    browser.check_announcements(test_suite, config, releases)
+    browser.check_snatches(test_suite, snatches)
 
 
 irc_thread = None
