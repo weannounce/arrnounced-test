@@ -110,6 +110,9 @@ def _get_main(config):
     global browser
     browser.get("http://localhost:" + str(config.web_port))
 
+    # Wait for tables to fill
+    time.sleep(0.5)
+
 
 def init(config):
     global browser
