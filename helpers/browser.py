@@ -3,8 +3,6 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
 import time
 
-from . import config as global_config
-
 browser = None
 
 
@@ -52,22 +50,41 @@ def check_announced(test_suite, config, release):
         check_snatches(test_suite, [release])
 
 
+def _get_announce_row(rows):
+    return _get_next_row(rows, "announced-pagination", "announced_torrents")
+
+
+def _get_snatch_row(rows):
+    return _get_next_row(rows, "snatched-pagination", "snatched_torrents")
+
+
+def _get_next_row(rows, pager_id, table_id):
+    if rows is None:
+        rows = []
+    elif len(rows) == 0:
+        browser.find_element_by_xpath(
+            "//*[@id='{}']/li/a[text()='Next']".format(pager_id)
+        ).click()
+
+    if len(rows) == 0:
+        rows = (
+            browser.find_element_by_id(table_id)
+            .find_element_by_tag_name("tbody")
+            .find_elements_by_tag_name("tr")
+        )
+
+    row = rows.pop(0)
+
+    return (row, rows)
+
+
 def check_announcements(test_suite, config, releases):
     _get_main(config)
-    table_rows = (
-        browser.find_element_by_id("announced_torrents")
-        .find_element_by_tag_name("tbody")
-        .find_elements_by_tag_name("tr")
-    )
 
-    test_suite.assertTrue(
-        len(table_rows) >= min(len(releases), global_config.webui_table_rows),
-        "No announcement in web table found",
-    )
-
-    for (row, release) in zip(
-        table_rows, list(reversed(releases))[: global_config.webui_table_rows]
-    ):
+    rows = None
+    for release in reversed(releases):
+        (row, rows) = _get_announce_row(rows)
+        test_suite.assertNotEqual(row, None, "Not enough releases in table")
         cells = row.find_elements_by_tag_name("td")
         test_suite.assertEqual(len(cells), 5)
         test_suite.assertEqual(cells[1].text, release.indexer)
@@ -87,18 +104,12 @@ def check_announcements(test_suite, config, releases):
 
 
 def check_snatches(test_suite, releases):
-    table_rows = (
-        browser.find_element_by_id("snatched_torrents")
-        .find_element_by_tag_name("tbody")
-        .find_elements_by_tag_name("tr")
-    )
-
-    rows_iter = iter(table_rows)
-    for release in list(reversed(releases))[: global_config.webui_table_rows]:
+    rows = None
+    for release in reversed(releases):
         if len(release.snatches) == 0:
             continue
+        (row, rows) = _get_snatch_row(rows)
 
-        row = next(rows_iter)
         cells = row.find_elements_by_tag_name("td")
         test_suite.assertEqual(len(cells), 4)
         test_suite.assertEqual(cells[1].text, release.indexer)

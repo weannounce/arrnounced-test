@@ -79,27 +79,21 @@ class DelayTest(unittest.TestCase):
 
             if i % 3 == 0:
                 backends.sonarr_send_approved(True)
-                backends.sonarr_send_approved(False)
-                backends.sonarr_send_approved(False)
                 release.snatches.append("Sonarr")
                 snatches.append(release)
             elif i % 5 == 0:
                 backends.radarr_send_approved(True)
-                backends.radarr_send_approved(False)
-                backends.radarr_send_approved(False)
                 release.snatches.append("Radarr")
                 snatches.append(release)
             elif i % 7 == 0:
                 backends.lidarr_send_approved(True)
-                backends.lidarr_send_approved(False)
-                backends.lidarr_send_approved(False)
                 release.snatches.append("Lidarr")
                 snatches.append(release)
             irc.announce(release, wait=0.3)
             releases.append(release)
 
-        backends.sonarr_max_announcements(self, 100)
-        backends.radarr_max_announcements(self, 100)
-        backends.lidarr_max_announcements(self, 100)
+        backends.sonarr_max_announcements(self, 90)
+        backends.radarr_max_announcements(self, 90)
+        backends.lidarr_max_announcements(self, 90)
 
         misc.check_announcements(self, config, releases, snatches)
