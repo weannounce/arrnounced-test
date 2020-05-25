@@ -39,6 +39,15 @@
 					<var name="food"/>
 				</vars>
 			</extract>
+			<extract>
+				<regex value="^(.*) - (.+) - (.+) -(?: \[(.*)\])?"/>
+				<vars>
+					<var name="torrentName"/>
+					<var name="$animal"/>
+					<var name="$mood"/>
+					<var name="food"/>
+				</vars>
+			</extract>
 		</linepatterns>
 		<linematched>
 			<var name="torrentUrl">

@@ -233,3 +233,90 @@ class SingleTest(unittest.TestCase):
         backends.lidarr_max_announcements(self, 1)
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
+
+    def test_no_snatch_second_pattern(self):
+        release = Release(
+            messages=["this is some name  -  -donkey- ; =grumpy=  -  food: pizza"],
+            channel=channel,
+            title="this is some name",
+            url="animal: donkey &mood=grumpy f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        irc.announce(release)
+
+        backends.check_sonarr_rx(
+            self, release,
+        )
+        backends.check_radarr_rx(
+            self, release,
+        )
+        backends.check_lidarr_rx(
+            self, release,
+        )
+
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
+
+        misc.check_announced(
+            self, config, release,
+        )
+
+    def test_non_capture_group_without_match(self):
+        release = Release(
+            messages=["yet a name - monkey - frustrated -"],
+            channel=channel,
+            title="yet a name",
+            url="animal: monkey &mood=frustrated f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        irc.announce(release)
+
+        backends.check_sonarr_rx(
+            self, release,
+        )
+        backends.check_radarr_rx(
+            self, release,
+        )
+        backends.check_lidarr_rx(
+            self, release,
+        )
+
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
+
+        misc.check_announced(
+            self, config, release,
+        )
+
+    def test_non_capture_group_with_match(self):
+        release = Release(
+            messages=["naaame - bat - splendid - [apple]"],
+            channel=channel,
+            title="naaame",
+            url="animal: bat &mood=splendid f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        irc.announce(release)
+
+        backends.check_sonarr_rx(
+            self, release,
+        )
+        backends.check_radarr_rx(
+            self, release,
+        )
+        backends.check_lidarr_rx(
+            self, release,
+        )
+
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
+
+        misc.check_announced(
+            self, config, release,
+        )
