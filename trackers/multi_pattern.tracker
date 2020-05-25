@@ -28,9 +28,10 @@
 				</vars>
 			</extract>
 			<extract>
-				<regex value="^Category:(.*)$"/>
+				<regex value="^Category:(.*);(?: (.*))?"/>
 				<vars>
 					<var name="category"/>
+					<var name="misc"/>
 				</vars>
 			</extract>
 			<extract>

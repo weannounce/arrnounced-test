@@ -33,7 +33,7 @@ class SingleTest(unittest.TestCase):
         release = Release(
             messages=[
                 "Old: multi title",
-                "Category: color tree fruit",
+                "Category: color tree fruit;",
                 "PATH: https://example/f?id=12345",
             ],
             channel=channel,
@@ -80,7 +80,7 @@ class SingleTest(unittest.TestCase):
         release = Release(
             messages=[
                 "Old: second multi ",
-                "Category: color",
+                "Category: color;",
                 "PATH: https://example/a?id=54321",
             ],
             channel=channel,
@@ -112,7 +112,7 @@ class SingleTest(unittest.TestCase):
 
     def test_renotify_lidarr(self):
         release = Release(
-            messages=["Old: third ", "Category: fruit", "PATH: https://ex/a?id=99"],
+            messages=["Old: third ", "Category: fruit;", "PATH: https://ex/a?id=99"],
             channel=channel,
             title="third",
             url="http://ex/dl.php/99/config_string/third.jpg",
@@ -155,6 +155,41 @@ class SingleTest(unittest.TestCase):
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 2)
+
+        misc.check_announced(
+            self, config, release,
+        )
+
+    def test_non_capture_with_match(self):
+        release = Release(
+            messages=[
+                "Old: some title",
+                "Category: color tree fruit; misc stuff",
+                "PATH: https://example/f?id=1357",
+            ],
+            channel=channel,
+            title="some title",
+            url="http://example/dl.php/1357/config_string/some+title.jpg",
+            indexer="Multi",
+            backends=["Sonarr", "Radarr", "Lidarr"],
+        )
+
+        irc.announce(release)
+        irc.announce(release)
+        irc.announce(release)
+
+        backends.check_sonarr_rx(
+            self, release,
+        )
+        backends.check_radarr_rx(
+            self, release,
+        )
+        backends.check_lidarr_rx(
+            self, release,
+        )
+
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
             self, config, release,
