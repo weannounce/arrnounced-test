@@ -161,6 +161,7 @@ def get_rx_list(backend_type):
         return lidarr_rx
 
 
+# TODO: Check API key
 def _run_backend(name, port, backend_type):
     app = Flask(name)
 

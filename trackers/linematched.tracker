@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<trackerinfo
+	type="linematched"
+	shortName="Linematched"
+	longName="Line Matched"
+	siteName="NA">
+
+	<settings>
+		<gazelle_fixed1/>
+		<cookie_fixed2/>
+	</settings>
+
+	<servers>
+		<server
+			network="NA"
+			serverNames="NA"
+			channelNames="#linematched"
+			announcerNames="arrtstprvidr"
+			/>
+	</servers>
+
+	<parseinfo>
+		<linepatterns>
+			<extract>
+        <regex value="^(.*)-(.*)$"/>
+				<vars>
+					<var name="extract1"/>
+					<var name="extract2"/>
+				</vars>
+			</extract>
+		</linepatterns>
+		<linematched>
+			<extract srcvar="extract2">
+				<regex value="^(.+);(.*)"/>
+				<vars>
+					<var name="extract3"/>
+					<var name="extract4"/>
+				</vars>
+			</extract>
+
+			<extract srcvar="extract1">
+				<regex value="^tags: (.*)"/>
+				<vars>
+					<var name="extract5"/>
+				</vars>
+			</extract>
+
+			<extractone>
+				<extract srcvar="extract3">
+          <regex value="(\[.*)missing\]"/>
+					<vars>
+						<var name="extractone1"/>
+					</vars>
+				</extract>
+				<extract srcvar="extract3">
+					<regex value="^extractone:(.*):"/>
+					<vars>
+						<var name="extractone1"/>
+					</vars>
+				</extract>
+			</extractone>
+
+      <varreplace name="varreplace1" srcvar="extract5" regex="\|" replace="/"/>
+
+			<extracttags srcvar="varreplace1" split="/">
+				<setvarif varName="extracttags1" regex="^tag1$"/>
+				<setvarif varName="extracttags1" regex="^no match$"/>
+
+				<setvarif varName="extracttags2" regex="no match"/>
+				<setvarif varName="extracttags2" regex="^(?:asdf|qwert|tag2)$"/>
+			</extracttags>
+
+			<setregex srcvar="extractone1" regex="SetRegex" varName="setregex1" newValue="SET"/>
+			<setregex srcvar="extract4" regex="1" varName="setregex2" newValue="IS1"/>
+
+			<if srcvar="setregex1" regex="^SET$">
+			  <setregex srcvar="extracttags1" regex="^tag1$" varName="if_setregex1" newValue="IF"/>
+        <varreplace name="if_varreplace" srcvar="extract4" regex="[>=]" replace="!="/>
+			</if>
+
+			<var name="torrentUrl">
+				<string value="matched: "/>
+				<var name="fixed1"/>
+				<string value="_"/>
+				<varenc name="fixed2"/>
+				<string value="_"/>
+				<var name="extractone1"/>
+				<string value="_"/>
+				<varenc name="extractone1"/>
+				<string value="_"/>
+				<var name="setregex2"/>
+			</var>
+
+			<var name="torrentName">
+				<var name="if_setregex1"/>
+				<string value=" "/>
+				<varenc name="if_varreplace"/>
+				<string value=" "/>
+				<var name="extracttags1"/>
+				<string value=" "/>
+				<varenc name="extracttags2"/>
+			</var>
+
+      <http name="cookie">
+        <var name="cookie"/>
+      </http>
+      <!--
+If:
+      -->
+		</linematched>
+	</parseinfo>
+</trackerinfo>

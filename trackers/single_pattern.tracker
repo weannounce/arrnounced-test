@@ -8,6 +8,7 @@
 	<settings>
 		<gazelle_fixed1/>
 		<cookie_fixed2/>
+		<cookie/>
 	</settings>
 
 	<servers>

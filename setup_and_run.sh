@@ -8,3 +8,4 @@ fi
 
 ./run_tests.py $@
 coverage combine
+coverage html
