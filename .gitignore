@@ -21,9 +21,6 @@ __pycache__/
 # databases
 *.db
 
-# configs
-*.cfg
-
 # generators
 *.bat
 
