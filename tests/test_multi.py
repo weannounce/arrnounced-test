@@ -19,7 +19,7 @@ class SingleTest(unittest.TestCase):
 
     @classmethod
     def tearDownClass(self):
-        misc.tearDownClass()
+        misc.tearDownClass(config)
 
     @db.db_session
     def setUp(self):

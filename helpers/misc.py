@@ -75,7 +75,7 @@ def setUpClass(config):
     browser.init(config)
 
 
-def tearDownClass():
+def tearDownClass(config):
     global irc_thread
     irc.stop()
     backends.stop()
@@ -83,4 +83,4 @@ def tearDownClass():
     browser.stop()
     irc_thread.join()
     irc.ready_event.clear()
-    arrnounced.stop()
+    arrnounced.stop(config)
