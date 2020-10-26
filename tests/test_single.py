@@ -226,7 +226,7 @@ class SingleTest(unittest.TestCase):
         )
 
         web.login(config)
-        web.renotify(self, config, db.get_announcement(), "NonExistant")
+        web.renotify(self, config, db.get_announcement(), -1)
 
         backends.sonarr_max_announcements(self, 1)
         backends.radarr_max_announcements(self, 1)
