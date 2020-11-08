@@ -4,9 +4,7 @@ from helpers.misc import Release
 
 channel = "#multi"
 config = misc.Config(
-    config_file="single_multi.cfg",
-    web_username="admin",
-    web_password="password",
+    config_file="multi_https.cfg",
     irc_channels=[channel],
     irc_users=["bipbopimalsobot"],
 )
@@ -32,13 +30,13 @@ class SingleTest(unittest.TestCase):
     def test_no_snatch(self):
         release = Release(
             messages=[
-                "Old: multi title",
+                "Old: httpstitle",
                 "Category: color tree fruit;",
                 "PATH: https://example/f?id=12345",
             ],
             channel=channel,
-            title="multi title",
-            url="http://example/dl.php/12345/config_string/multi+title.jpg",
+            title="httpstitle",
+            url="https://example/dl.php/12345/cfgstr/httpstitle.jpg",
             indexer="Multi",
             backends=["Sonarr", "Radarr", "Lidarr"],
         )
@@ -85,9 +83,9 @@ class SingleTest(unittest.TestCase):
             ],
             channel=channel,
             title="second multi",
-            url="http://example/dl.php/54321/config_string/second+multi.jpg",
+            url="https://example/dl.php/54321/cfgstr/second+multi.jpg",
             indexer="Multi",
-            backends=["Sonarr"],
+            backends=["Sonarr", "Radarr", "Lidarr"],
             snatches=["Sonarr"],
         )
 
@@ -115,9 +113,9 @@ class SingleTest(unittest.TestCase):
             messages=["Old: third ", "Category: fruit;", "PATH: https://ex/a?id=99"],
             channel=channel,
             title="third",
-            url="http://ex/dl.php/99/config_string/third.jpg",
+            url="https://ex/dl.php/99/cfgstr/third.jpg",
             indexer="Multi",
-            backends=["Radarr"],
+            backends=["Sonarr", "Radarr", "Lidarr"],
             snatches=["Radarr"],
         )
 
@@ -130,8 +128,8 @@ class SingleTest(unittest.TestCase):
         backends.check_radarr_rx(
             self, release,
         )
-        backends.sonarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.sonarr_max_announcements(self, 1)
+        backends.lidarr_max_announcements(self, 1)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
@@ -169,7 +167,7 @@ class SingleTest(unittest.TestCase):
             ],
             channel=channel,
             title="some title",
-            url="http://example/dl.php/1357/config_string/some+title.jpg",
+            url="https://example/dl.php/1357/cfgstr/some+title.jpg",
             indexer="Multi",
             backends=["Sonarr", "Radarr", "Lidarr"],
         )
