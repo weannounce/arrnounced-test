@@ -38,7 +38,7 @@ def kick(user, channel, reason):
     asyncio.run_coroutine_threadsafe(
         client.rawmsg("SAKICK", channel, user, reason), event_loop
     )
-    time.sleep(2)
+    time.sleep(0.1)
 
 
 def part(user, channel, reason):
@@ -47,21 +47,21 @@ def part(user, channel, reason):
     asyncio.run_coroutine_threadsafe(
         client.rawmsg("SAPART", user, channel, reason), event_loop
     )
-    time.sleep(2)
+    time.sleep(0.1)
 
 
 def join(user, channel):
     global client
     global event_loop
     asyncio.run_coroutine_threadsafe(client.rawmsg("SAJOIN", user, channel), event_loop)
-    time.sleep(2)
+    time.sleep(0.1)
 
 
 def kill(user, reason):
     global client
     global event_loop
     asyncio.run_coroutine_threadsafe(client.rawmsg("KILL", user, reason), event_loop)
-    time.sleep(10)
+    time.sleep(0.1)
 
 
 def mode(modes, channel, add=True, user=global_config.irc_nickname):
