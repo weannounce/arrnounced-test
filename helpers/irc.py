@@ -32,6 +32,38 @@ def announce(release, wait=0.5):
     time.sleep(wait)
 
 
+def kick(user, channel, reason):
+    global client
+    global event_loop
+    asyncio.run_coroutine_threadsafe(
+        client.rawmsg("SAKICK", channel, user, reason), event_loop
+    )
+    time.sleep(2)
+
+
+def part(user, channel, reason):
+    global client
+    global event_loop
+    asyncio.run_coroutine_threadsafe(
+        client.rawmsg("SAPART", user, channel, reason), event_loop
+    )
+    time.sleep(2)
+
+
+def join(user, channel):
+    global client
+    global event_loop
+    asyncio.run_coroutine_threadsafe(client.rawmsg("SAJOIN", user, channel), event_loop)
+    time.sleep(2)
+
+
+def kill(user, reason):
+    global client
+    global event_loop
+    asyncio.run_coroutine_threadsafe(client.rawmsg("KILL", user, reason), event_loop)
+    time.sleep(10)
+
+
 class IRC(BotBase):
     def __init__(self, nickname, channel, event_loop):
         super().__init__(nickname, eventloop=event_loop)
@@ -50,6 +82,7 @@ class IRC(BotBase):
     async def on_connect(self):
         print("Connected to IRC")
         await super().on_connect()
+        await self.rawmsg("OPER", global_config.irc_nickname, global_config.irc_oper_pw)
         await self.join(self.channel)
 
     async def on_join(self, channel, user):
