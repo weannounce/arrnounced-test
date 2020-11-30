@@ -9,7 +9,7 @@ trackers = [
 ]
 backens = ["Sonarr", "Radarr", "Lidarr"]
 config = misc.Config(
-    config_file="pages.cfg",
+    config_file="pages.toml",
     irc_channels=[t["channel"] for t in trackers],
     irc_users=["bipbopsimple1", "bipbopsimple2", "bipbopsimple3"],
 )

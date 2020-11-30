@@ -66,7 +66,7 @@ def run(config):
                 current_directory
                 + "/configs/"
                 + config.config_file
-                + ":/config/settings.cfg",
+                + ":/config/settings.toml",
                 "-v",
                 current_directory + "/trackers:/trackers",
                 "-e",

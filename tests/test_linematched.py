@@ -4,7 +4,9 @@ from helpers.misc import Release
 
 channel = "#linematched"
 config = misc.Config(
-    config_file="linematched.cfg", irc_channels=[channel], irc_users=["linematcherbot"],
+    config_file="linematched.toml",
+    irc_channels=[channel],
+    irc_users=["linematcherbot"],
 )
 
 

@@ -4,7 +4,7 @@ from helpers.misc import Release
 
 channel = "#single"
 config = misc.Config(
-    config_file="single_multi.cfg",
+    config_file="single_multi.toml",
     web_username="admin",
     web_password="password",
     irc_channels=[channel],

@@ -5,7 +5,7 @@ import time
 
 channel = "#delay"
 config = misc.Config(
-    config_file="delay.cfg", irc_channels=[channel], irc_users=["bipbopdelayed"],
+    config_file="delay.toml", irc_channels=[channel], irc_users=["bipbopdelayed"],
 )
 
 

@@ -4,7 +4,7 @@ from helpers.misc import Release
 
 channel = "#multi"
 config = misc.Config(
-    config_file="multi_https.cfg",
+    config_file="multi_https.toml",
     irc_channels=[channel],
     irc_users=["bipbopimalsobot"],
 )

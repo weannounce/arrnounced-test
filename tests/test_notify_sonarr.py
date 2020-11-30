@@ -5,7 +5,9 @@ import selenium
 
 channel = "#single"
 config = misc.Config(
-    config_file="notify_sonarr.cfg", irc_channels=[channel], irc_users=["bipbopiambot"],
+    config_file="notify_sonarr.toml",
+    irc_channels=[channel],
+    irc_users=["bipbopiambot"],
 )
 
 
