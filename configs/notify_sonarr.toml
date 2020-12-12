@@ -13,11 +13,13 @@ apikey = "abcdef123"
 [radarr]
 apikey = "987654321"
 
-[single]
+[trackers.single]
 irc_nickname = "bipbopiambot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#single"
+notify_sonarr = true
+
+[trackers.single.settings]
 fixed1 = "first_fixed"
 fixed2 = "fixed_second"
-notify_sonarr = true

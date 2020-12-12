@@ -18,23 +18,24 @@ apikey = "123456789"
 [radarr]
 apikey = "987654321"
 
-[single]
+[trackers.single]
 irc_nickname = "bipbopiambot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#single"
+
+[trackers.single.settings]
 fixed1 = "first_fixed"
 fixed2 = "fixed_second"
-#irc_inviter =
-#irc_invite_cmd =
-#announce_delay = 10
 
-[multi]
+[trackers.multi]
 irc_nickname = "bipbopimalsobot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#multi"
-from_config = "config_string"
 category_sonarr = "color"
 category_radarr = "fruit"
 category_lidarr = "tree|bush"
+
+[trackers.multi.settings]
+from_config = "config_string"

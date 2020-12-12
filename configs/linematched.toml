@@ -14,10 +14,11 @@ apikey = "lineapilid"
 [radarr]
 apikey = "lineapirad"
 
-[linematched]
+[trackers.linematched]
 irc_nickname = "linematcherbot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#linematched"
-fixed1 = "mfix1&"
+
+[trackers.linematched.settings]
 fixed2 = "mfix2&"
