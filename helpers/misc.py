@@ -8,6 +8,7 @@ class Config:
         config_file,
         irc_channels,
         irc_users,
+        backends,
         web_username=None,
         web_password=None,
         web_port=3467,
@@ -18,6 +19,7 @@ class Config:
         self.web_username = web_username
         self.web_password = web_password
         self.irc_users = irc_users
+        self.backends = backends
 
 
 class Release:
@@ -67,7 +69,7 @@ def setUpClass(config):
     irc_thread = Thread(target=irc.run, args=[config])
     irc_thread.start()
     arrnounced.run(config)
-    backends.run()
+    backends.run(config)
     db.init()
     irc.ready_event.wait()
 

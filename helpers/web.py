@@ -19,10 +19,10 @@ def logout():
     session = None
 
 
-def renotify(test_suite, config, announcement, backend_id):
+def renotify(test_suite, config, announcement, backend_name):
     result = session.post(
         "http://localhost:{}/notify".format(config.web_port),
-        json={"id": announcement.id, "backend_id": backend_id},
+        json={"id": announcement.id, "backend_name": backend_name},
     )
 
     test_suite.assertEqual(result.status_code, 200)

@@ -5,13 +5,16 @@ shutdown = true
 to_file = true
 to_console = false
 
-[sonarr]
+[backends.line_sonarr]
+type = "sonarr"
 apikey = "lineapison"
 
-[lidarr]
+[backends.line_lidarr]
+type = "lidarr"
 apikey = "lineapilid"
 
-[radarr]
+[backends.line_radarr]
+type = "radarr"
 apikey = "lineapirad"
 
 [trackers.linematched]
@@ -21,4 +24,5 @@ irc_port = 6667
 irc_channels = "#linematched"
 
 [trackers.linematched.settings]
+fixed1 = "mfix1&"
 fixed2 = "mfix2&"

@@ -1,37 +1,33 @@
 from flask import Flask, request, jsonify
 import requests
+import sys
 import threading
 from datetime import datetime
-from enum import Enum
 
 
-class BackendType(Enum):
-    SONARR = 1
-    RADARR = 2
-    LIDARR = 3
-
-
-sonarr_rx = []
-radarr_rx = []
-lidarr_rx = []
-
-sonarr_tx = []
-radarr_tx = []
-lidarr_tx = []
+rx_lists = {}
+tx_lists = {}
 
 
 class Backend:
-    def __init__(self, name, port):
+    def __init__(self, name, port=None):
         self.name = name
-        self.port = port
         self.thread = None
 
+        if port is not None:
+            self.port = port
+        elif "sonarr" in name.lower():
+            self.port = 8989
+        elif "radarr" in name.lower():
+            self.port = 7878
+        elif "lidarr" in name.lower():
+            self.port = 8686
+        else:
+            print("Not backend port specified!")
+            sys.exit(1)
 
-backends = {
-    BackendType.SONARR: Backend("sonarr", 8989),
-    BackendType.RADARR: Backend("radarr", 7878),
-    BackendType.LIDARR: Backend("lidarr", 8686),
-}
+
+_backends = {}
 
 
 def get_date_diff(release, publish_date):
@@ -39,27 +35,14 @@ def get_date_diff(release, publish_date):
     return abs((release.announce_time - dt).total_seconds())
 
 
-def check_sonarr_rx(test_suite, release):
-    _check_rx(sonarr_rx, test_suite, release)
-
-
-def check_radarr_rx(test_suite, release):
-    _check_rx(radarr_rx, test_suite, release)
-
-
-def check_lidarr_rx(test_suite, release):
-    temp_indexer = release.indexer
-    release.indexer = None
-    _check_rx(lidarr_rx, test_suite, release)
-    release.indexer = temp_indexer
-
-
-def _check_rx(rx_list, test_suite, release):
-    test_suite.assertNotEqual(len(rx_list), 0, "No announcements to this backend")
-    rx = rx_list.pop(0)
+def check_rx(test_suite, name, release):
+    test_suite.assertNotEqual(
+        len(rx_lists[name]), 0, "No announcements to this backend"
+    )
+    rx = rx_lists[name].pop(0)
 
     local_indexer = None
-    if release.indexer is not None:
+    if "lidarr" not in name.lower():
         local_indexer = "Irc" + release.indexer
     test_suite.assertEqual(release.title, rx["title"], "Title is not matching")
     test_suite.assertEqual(
@@ -72,103 +55,47 @@ def _check_rx(rx_list, test_suite, release):
     test_suite.assertEqual(release.protocol, rx["protocol"], "Protocol is not matching")
 
 
-def sonarr_max_announcements(test_suite, nr):
+def max_announcements(test_suite, name, nr):
     for _ in range(nr):
-        sonarr_received()
-    test_suite.assertEqual(sonarr_received(), None)
+        received(name)
+    test_suite.assertEqual(received(name), None)
 
 
-def radarr_max_announcements(test_suite, nr):
-    for _ in range(nr):
-        radarr_received()
-    test_suite.assertEqual(radarr_received(), None)
+def received(name):
+    return None if len(rx_lists[name]) == 0 else rx_lists[name].pop(0)
 
 
-def lidarr_max_announcements(test_suite, nr):
-    for _ in range(nr):
-        lidarr_received()
-    test_suite.assertEqual(lidarr_received(), None)
+def send(name, response):
+    tx_lists[name].append(response)
 
 
-def sonarr_received():
-    return None if len(sonarr_rx) == 0 else sonarr_rx.pop(0)
-
-
-def radarr_received():
-    return None if len(radarr_rx) == 0 else radarr_rx.pop(0)
-
-
-def lidarr_received():
-    return None if len(lidarr_rx) == 0 else lidarr_rx.pop(0)
-
-
-def sonarr_send(response):
-    sonarr_tx.append(response)
-
-
-def radarr_send(response):
-    radarr_tx.append(response)
-
-
-def lidarr_send(response):
-    lidarr_tx.append(response)
-
-
-def sonarr_send_approved(approved):
-    sonarr_tx.append({"approved": approved})
-
-
-def radarr_send_approved(approved):
-    radarr_tx.append({"approved": approved})
-
-
-def lidarr_send_approved(approved):
-    lidarr_tx.append({"approved": approved})
+def send_approved(name, approved):
+    tx_lists[name].append({"approved": approved})
 
 
 def clear_all_backends():
-    global sonarr_rx
-    global radarr_rx
-    global lidarr_rx
-    global sonarr_tx
-    global radarr_tx
-    global lidarr_tx
-
-    sonarr_rx = []
-    radarr_rx = []
-    lidarr_rx = []
-
-    sonarr_tx = []
-    radarr_tx = []
-    lidarr_tx = []
+    for b in rx_lists.keys():
+        rx_lists[b] = []
+    for b in tx_lists.keys():
+        tx_lists[b] = []
 
 
-def get_tx_list(backend_type):
-    if backend_type == BackendType.SONARR:
-        return sonarr_tx
-    if backend_type == BackendType.RADARR:
-        return radarr_tx
-    if backend_type == BackendType.LIDARR:
-        return lidarr_tx
+def get_tx_list(backend_name):
+    return tx_lists[backend_name]
 
 
-def get_rx_list(backend_type):
-    if backend_type == BackendType.SONARR:
-        return sonarr_rx
-    if backend_type == BackendType.RADARR:
-        return radarr_rx
-    if backend_type == BackendType.LIDARR:
-        return lidarr_rx
+def get_rx_list(backend_name):
+    return rx_lists[backend_name]
 
 
 # TODO: Check API key
-def _run_backend(name, port, backend_type):
-    app = Flask(name)
+def _run_backend(backend):
+    app = Flask(backend.name)
 
     @app.route("/api/release/push", methods=["POST"])
     def push():
-        rx_list = get_rx_list(backend_type)
-        tx_list = get_tx_list(backend_type)
+        rx_list = get_rx_list(backend.name)
+        tx_list = get_tx_list(backend.name)
 
         rx_list.append(request.json)
 
@@ -179,8 +106,8 @@ def _run_backend(name, port, backend_type):
 
     @app.route("/api/v1/release/push", methods=["POST"])
     def push_v1():
-        rx_list = get_rx_list(backend_type)
-        tx_list = get_tx_list(backend_type)
+        rx_list = get_rx_list(backend.name)
+        tx_list = get_tx_list(backend.name)
 
         rx_list.append(request.json)
 
@@ -197,7 +124,7 @@ def _run_backend(name, port, backend_type):
         func()
         return "Shutting down..."
 
-    app.run(port=port)
+    app.run(port=backend.port)
 
 
 def _call_shutdown(port):
@@ -205,30 +132,29 @@ def _call_shutdown(port):
 
 
 def stop():
-    global backends
-    for b in backends.keys():
-        if backends[b].thread is not None:
-            if not _call_shutdown(backends[b].port):
-                print("Could not shutdown " + backends[b].name)
-            backends[b].thread.join()
-            backends[b].thread = None
+    global _backends
+    global rx_lists
+    global tx_lists
+    for b in _backends.keys():
+        if _backends[b].thread is not None:
+            if not _call_shutdown(_backends[b].port):
+                print("Could not shutdown " + _backends[b].name)
+            _backends[b].thread.join()
+            _backends[b].thread = None
+
+    _backends = {}
+    rx_lists = {}
+    tx_lists = {}
 
 
-def _create_thread(backend_type):
-    global backends
-    backends[backend_type].thread = threading.Thread(
-        target=_run_backend,
-        args=(backends[backend_type].name, backends[backend_type].port, backend_type),
-    )
-    backends[backend_type].thread.start()
+def _create_thread(backend):
+    _backends[backend.name] = backend
+    backend.thread = threading.Thread(target=_run_backend, args=(backend,),)
+    backend.thread.start()
 
 
-def run(sonarr=True, radarr=True, lidarr=True):
-    if sonarr:
-        _create_thread(BackendType.SONARR)
-
-    if radarr:
-        _create_thread(BackendType.RADARR)
-
-    if lidarr:
-        _create_thread(BackendType.LIDARR)
+def run(config):
+    for backend in config.backends:
+        rx_lists[backend.name] = []
+        tx_lists[backend.name] = []
+        _create_thread(backend)

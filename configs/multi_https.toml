@@ -5,13 +5,16 @@ shutdown = true
 to_file = true
 to_console = false
 
-[sonarr]
+[backends.my_sonarr]
+type = "sonarr"
 apikey = "abcdef123"
 
-[lidarr]
+[backends.my_lidarr]
+type = "lidarr"
 apikey = "123456789"
 
-[radarr]
+[backends.my_radarr]
+type = "radarr"
 apikey = "987654321"
 
 [trackers.multi]

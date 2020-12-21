@@ -7,11 +7,15 @@ trackers = [
     {"channel": "#simple2", "name": "Simple2", "url": "else"},
     {"channel": "#simple3", "name": "Simple3", "url": "or"},
 ]
-backens = ["Sonarr", "Radarr", "Lidarr"]
 config = misc.Config(
     config_file="pages.toml",
     irc_channels=[t["channel"] for t in trackers],
     irc_users=["bipbopsimple1", "bipbopsimple2", "bipbopsimple3"],
+    backends=[
+        backends.Backend("MySonarr"),
+        backends.Backend("MyLidarr"),
+        backends.Backend("MyRadarr"),
+    ],
 )
 
 
@@ -43,21 +47,21 @@ class DelayTest(unittest.TestCase):
                 title="title {}".format(i),
                 url="{}: something {}".format(tracker["url"], i),
                 indexer=tracker["name"],
-                backends=["Sonarr", "Radarr", "Lidarr"],
+                backends=[b.name for b in config.backends],
             )
 
             irc.announce(release, wait=0.3)
             releases.append(release)
 
         for release in releases:
-            backends.check_sonarr_rx(
-                self, release,
+            backends.check_rx(
+                self, "MySonarr", release,
             )
-            backends.check_radarr_rx(
-                self, release,
+            backends.check_rx(
+                self, "MyRadarr", release,
             )
-            backends.check_lidarr_rx(
-                self, release,
+            backends.check_rx(
+                self, "MyLidarr", release,
             )
 
         misc.check_announcements(self, config, releases, [])
@@ -74,26 +78,26 @@ class DelayTest(unittest.TestCase):
                 title="title {}".format(i),
                 url="{}: else {}".format(tracker["url"], i),
                 indexer=tracker["name"],
-                backends=["Sonarr", "Radarr", "Lidarr"],
+                backends=[b.name for b in config.backends],
             )
 
             if i % 3 == 0:
-                backends.sonarr_send_approved(True)
-                release.snatches.append("Sonarr")
+                backends.send_approved("MySonarr", True)
+                release.snatches.append("MySonarr")
                 snatches.append(release)
             elif i % 5 == 0:
-                backends.radarr_send_approved(True)
-                release.snatches.append("Radarr")
+                backends.send_approved("MyRadarr", True)
+                release.snatches.append("MyRadarr")
                 snatches.append(release)
             elif i % 7 == 0:
-                backends.lidarr_send_approved(True)
-                release.snatches.append("Lidarr")
+                backends.send_approved("MyLidarr", True)
+                release.snatches.append("MyLidarr")
                 snatches.append(release)
             irc.announce(release, wait=0.3)
             releases.append(release)
 
-        backends.sonarr_max_announcements(self, 90)
-        backends.radarr_max_announcements(self, 90)
-        backends.lidarr_max_announcements(self, 90)
+        backends.max_announcements(self, "MySonarr", 90)
+        backends.max_announcements(self, "MyRadarr", 90)
+        backends.max_announcements(self, "MyLidarr", 90)
 
         misc.check_announcements(self, config, releases, snatches)

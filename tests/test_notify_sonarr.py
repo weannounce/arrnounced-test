@@ -8,6 +8,7 @@ config = misc.Config(
     config_file="notify_sonarr.toml",
     irc_channels=[channel],
     irc_users=["bipbopiambot"],
+    backends=[backends.Backend("my_sonarr"), backends.Backend("my_radarr")],
 )
 
 
@@ -35,16 +36,15 @@ class SingleTest(unittest.TestCase):
             title="this is a name",
             url="animal: cow &mood=angry f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=["Sonarr"],
+            backends=["my_sonarr"],
         )
 
         irc.announce(release)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_sonarr", release,
         )
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_radarr", 0)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
@@ -60,20 +60,19 @@ class SingleTest(unittest.TestCase):
             title="son snatch",
             url="animal: dog &mood=sad f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=["Sonarr"],
-            snatches=["Sonarr"],
+            backends=["my_sonarr"],
+            snatches=["my_sonarr"],
         )
 
-        backends.sonarr_send_approved(True)
+        backends.send_approved("my_sonarr", True)
 
         irc.announce(release)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_sonarr", release,
         )
 
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_radarr", 0)
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
@@ -88,20 +87,19 @@ class SingleTest(unittest.TestCase):
             title="son snatch2",
             url="animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=["Sonarr"],
-            snatches=["Sonarr"],
+            backends=["my_sonarr"],
+            snatches=["my_sonarr"],
         )
 
-        backends.sonarr_send_approved(True)
+        backends.send_approved("my_sonarr", True)
 
         irc.announce(release)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_sonarr", release,
         )
 
-        backends.radarr_max_announcements(self, 1)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_radarr", 1)
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
@@ -109,10 +107,10 @@ class SingleTest(unittest.TestCase):
             self, config, release,
         )
 
-        backends.radarr_send_approved(True)
+        backends.send_approved("my_radarr", True)
 
-        browser.renotify(self, config, table_row=1, backend="Sonarr", success=False)
-        browser.renotify(self, config, table_row=1, backend="Radarr", success=True)
+        browser.renotify(self, config, table_row=1, backend="my_sonarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="my_radarr", success=True)
 
         self.assertRaises(
             selenium.common.exceptions.NoSuchElementException,
@@ -120,14 +118,14 @@ class SingleTest(unittest.TestCase):
             self,
             config,
             1,
-            "Lidarr",
+            "my_lidarr",
             False,
         )
 
-        release.snatches.append("Radarr")
+        release.snatches.append("my_radarr")
 
-        backends.check_radarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_radarr", release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)

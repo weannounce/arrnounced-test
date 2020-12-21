@@ -7,6 +7,11 @@ config = misc.Config(
     config_file="linematched.toml",
     irc_channels=[channel],
     irc_users=["linematcherbot"],
+    backends=[
+        backends.Backend("line_sonarr"),
+        backends.Backend("line_lidarr"),
+        backends.Backend("line_radarr"),
+    ],
 )
 
 
@@ -34,14 +39,14 @@ class LineMatchedTest(unittest.TestCase):
             title="IF 2%21%3D1 tag1 qwert",
             url="matched: mfix1&_mfix2%26_SetRegex%_SetRegex%25_IS1",
             indexer="Linematched",
-            backends=["Sonarr", "Radarr", "Lidarr"],
+            backends=[b.name for b in config.backends],
         )
 
         irc.announce(release)
 
-        backends.sonarr_max_announcements(self, 1)
-        backends.radarr_max_announcements(self, 1)
-        backends.lidarr_max_announcements(self, 1)
+        backends.max_announcements(self, "line_sonarr", 1)
+        backends.max_announcements(self, "line_radarr", 1)
+        backends.max_announcements(self, "line_lidarr", 1)
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
@@ -56,14 +61,14 @@ class LineMatchedTest(unittest.TestCase):
             title="IF 1 tag1 tag2",
             url="matched: mfix1&_mfix2%26_SetRegex_SetRegex_IS1",
             indexer="Linematched",
-            backends=["Sonarr", "Radarr", "Lidarr"],
+            backends=[b.name for b in config.backends],
         )
 
         irc.announce(release)
 
-        backends.sonarr_max_announcements(self, 1)
-        backends.radarr_max_announcements(self, 1)
-        backends.lidarr_max_announcements(self, 1)
+        backends.max_announcements(self, "line_sonarr", 1)
+        backends.max_announcements(self, "line_radarr", 1)
+        backends.max_announcements(self, "line_lidarr", 1)
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
@@ -78,9 +83,9 @@ class LineMatchedTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.sonarr_max_announcements(self, 0)
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "line_sonarr", 0)
+        backends.max_announcements(self, "line_radarr", 0)
+        backends.max_announcements(self, "line_lidarr", 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
@@ -89,8 +94,8 @@ class LineMatchedTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.sonarr_max_announcements(self, 0)
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "line_sonarr", 0)
+        backends.max_announcements(self, "line_radarr", 0)
+        backends.max_announcements(self, "line_lidarr", 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)

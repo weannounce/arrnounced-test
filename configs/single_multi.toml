@@ -9,13 +9,16 @@ shutdown = "true"
 to_file = true
 to_console = false
 
-[sonarr]
+[backends.my_sonarr]
+type = "sonarr"
 apikey = "abcdef123"
 
-[lidarr]
+[backends.my_lidarr]
+type = "lidarr"
 apikey = "123456789"
 
-[radarr]
+[backends.my_radarr]
+type = "radarr"
 apikey = "987654321"
 
 [trackers.single]
@@ -33,9 +36,11 @@ irc_nickname = "bipbopimalsobot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#multi"
-category_sonarr = "color"
-category_radarr = "fruit"
-category_lidarr = "tree|bush"
+
+[trackers.multi.category]
+my_sonarr = "color"
+my_radarr = "fruit"
+my_lidarr = "tree|bush"
 
 [trackers.multi.settings]
 from_config = "config_string"

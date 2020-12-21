@@ -7,10 +7,12 @@ shutdown = true
 to_file = true
 to_console = false
 
-[sonarr]
+[backends.my_sonarr]
+type = "sonarr"
 apikey = "abcdef123"
 
-[radarr]
+[backends.my_radarr]
+type = "radarr"
 apikey = "987654321"
 
 [trackers.single]
@@ -18,7 +20,7 @@ irc_nickname = "bipbopiambot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#single"
-notify_sonarr = true
+notify = "my_sonarr"
 
 [trackers.single.settings]
 fixed1 = "first_fixed"

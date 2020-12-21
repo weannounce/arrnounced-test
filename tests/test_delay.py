@@ -5,7 +5,14 @@ import time
 
 channel = "#delay"
 config = misc.Config(
-    config_file="delay.toml", irc_channels=[channel], irc_users=["bipbopdelayed"],
+    config_file="delay.toml",
+    irc_channels=[channel],
+    irc_users=["bipbopdelayed"],
+    backends=[
+        backends.Backend("delayed_sonarr"),
+        backends.Backend("delayed_lidarr"),
+        backends.Backend("delayed_radarr"),
+    ],
 )
 
 
@@ -33,26 +40,26 @@ class DelayTest(unittest.TestCase):
             title="title 1",
             url="stuff: stuff 1",
             indexer="Delay",
-            backends=["Sonarr", "Radarr", "Lidarr"],
+            backends=[b.name for b in config.backends],
         )
 
         irc.announce(release)
         time.sleep(6)
 
-        backends.sonarr_max_announcements(self, 0)
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "delayed_sonarr", 0)
+        backends.max_announcements(self, "delayed_radarr", 0)
+        backends.max_announcements(self, "delayed_lidarr", 0)
 
         time.sleep(2)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "delayed_sonarr", release,
         )
-        backends.check_radarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "delayed_radarr", release,
         )
-        backends.check_lidarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "delayed_lidarr", release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)

@@ -5,15 +5,19 @@ shutdown = true
 to_file = true
 to_console = false
 
-[sonarr]
+[backends.delayed_sonarr]
+type = "Sonarr"
 apikey = "delaysonkey"
 
-[lidarr]
+[backends.delayed_lidarr]
+type = "lIdarr"
 apikey = "delaylidkey"
 
-[radarr]
+[backends.delayed_radarr]
+type = "raDarr"
 apikey = "delayradkey"
 
+# TODO: Test TLS
 [trackers.delay]
 irc_nickname = "bipbopdelayed"
 irc_server = "192.168.1.10"

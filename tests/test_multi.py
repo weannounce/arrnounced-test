@@ -9,6 +9,11 @@ config = misc.Config(
     web_password="password",
     irc_channels=[channel],
     irc_users=["bipbopimalsobot"],
+    backends=[
+        backends.Backend("my_sonarr"),
+        backends.Backend("my_lidarr"),
+        backends.Backend("my_radarr"),
+    ],
 )
 
 
@@ -40,33 +45,33 @@ class SingleTest(unittest.TestCase):
             title="multi title",
             url="http://example/dl.php/12345/config_string/multi+title.jpg",
             indexer="Multi",
-            backends=["Sonarr", "Radarr", "Lidarr"],
+            backends=[b.name for b in config.backends],
         )
 
         irc.announce(release)
-        backends.sonarr_max_announcements(self, 0)
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_sonarr", 0)
+        backends.max_announcements(self, "my_radarr", 0)
+        backends.max_announcements(self, "my_lidarr", 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
         irc.announce(release)
-        backends.sonarr_max_announcements(self, 0)
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_sonarr", 0)
+        backends.max_announcements(self, "my_radarr", 0)
+        backends.max_announcements(self, "my_lidarr", 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
         irc.announce(release)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_sonarr", release,
         )
-        backends.check_radarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_radarr", release,
         )
-        backends.check_lidarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_lidarr", release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -87,21 +92,21 @@ class SingleTest(unittest.TestCase):
             title="second multi",
             url="http://example/dl.php/54321/config_string/second+multi.jpg",
             indexer="Multi",
-            backends=["Sonarr"],
-            snatches=["Sonarr"],
+            backends=["my_sonarr"],
+            snatches=["my_sonarr"],
         )
 
-        backends.sonarr_send_approved(True)
+        backends.send_approved("my_sonarr", True)
 
         irc.announce(release)
         irc.announce(release)
         irc.announce(release)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_sonarr", release,
         )
-        backends.radarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_radarr", 0)
+        backends.max_announcements(self, "my_lidarr", 0)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
@@ -117,21 +122,21 @@ class SingleTest(unittest.TestCase):
             title="third",
             url="http://ex/dl.php/99/config_string/third.jpg",
             indexer="Multi",
-            backends=["Radarr"],
-            snatches=["Radarr"],
+            backends=["my_radarr"],
+            snatches=["my_radarr"],
         )
 
-        backends.radarr_send_approved(True)
+        backends.send_approved("my_radarr", True)
 
         irc.announce(release)
         irc.announce(release)
         irc.announce(release)
 
-        backends.check_radarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_radarr", release,
         )
-        backends.sonarr_max_announcements(self, 0)
-        backends.lidarr_max_announcements(self, 0)
+        backends.max_announcements(self, "my_sonarr", 0)
+        backends.max_announcements(self, "my_lidarr", 0)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
@@ -140,18 +145,18 @@ class SingleTest(unittest.TestCase):
             self, config, release,
         )
 
-        backends.lidarr_send_approved(True)
-        browser.renotify(self, config, table_row=1, backend="Sonarr", success=False)
-        browser.renotify(self, config, table_row=1, backend="Radarr", success=False)
-        browser.renotify(self, config, table_row=1, backend="Lidarr", success=True)
+        backends.send_approved("my_lidarr", True)
+        browser.renotify(self, config, table_row=1, backend="my_sonarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="my_radarr", success=False)
+        browser.renotify(self, config, table_row=1, backend="my_lidarr", success=True)
 
-        release.snatches.append("Lidarr")
+        release.snatches.append("my_lidarr")
 
-        backends.check_lidarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_lidarr", release,
         )
-        backends.sonarr_max_announcements(self, 1)
-        backends.radarr_max_announcements(self, 1)
+        backends.max_announcements(self, "my_sonarr", 1)
+        backends.max_announcements(self, "my_radarr", 1)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 2)
@@ -171,21 +176,21 @@ class SingleTest(unittest.TestCase):
             title="some title",
             url="http://example/dl.php/1357/config_string/some+title.jpg",
             indexer="Multi",
-            backends=["Sonarr", "Radarr", "Lidarr"],
+            backends=[b.name for b in config.backends],
         )
 
         irc.announce(release)
         irc.announce(release)
         irc.announce(release)
 
-        backends.check_sonarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_sonarr", release,
         )
-        backends.check_radarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_radarr", release,
         )
-        backends.check_lidarr_rx(
-            self, release,
+        backends.check_rx(
+            self, "my_lidarr", release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
