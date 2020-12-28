@@ -3,7 +3,7 @@ host = "0.0.0.0"
 port = 3467
 username = "admin"
 password = "password"
-shutdown = "true"
+shutdown = true
 
 [log]
 to_file = true
