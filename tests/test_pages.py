@@ -11,11 +11,14 @@ config = misc.Config(
     config_file="pages.toml",
     irc_channels=[t["channel"] for t in trackers],
     irc_users=["bipbopsimple1", "bipbopsimple2", "bipbopsimple3"],
-    backends=[
-        backends.Backend("MySonarr"),
-        backends.Backend("MyLidarr"),
-        backends.Backend("MyRadarr"),
-    ],
+    backends={
+        b[0]: backends.Backend(b[0], b[1])
+        for b in [
+            ("MySonarr", "simplesonkey"),
+            ("MyLidarr", "simplelidkey"),
+            ("MyRadarr", "simpleradkey"),
+        ]
+    },
 )
 
 
@@ -47,7 +50,7 @@ class DelayTest(unittest.TestCase):
                 title="title {}".format(i),
                 url="{}: something {}".format(tracker["url"], i),
                 indexer=tracker["name"],
-                backends=[b.name for b in config.backends],
+                backends=config.backends.keys(),
             )
 
             irc.announce(release, wait=0.3)
@@ -55,13 +58,13 @@ class DelayTest(unittest.TestCase):
 
         for release in releases:
             backends.check_rx(
-                self, "MySonarr", release,
+                self, config.backends["MySonarr"], release,
             )
             backends.check_rx(
-                self, "MyRadarr", release,
+                self, config.backends["MyRadarr"], release,
             )
             backends.check_rx(
-                self, "MyLidarr", release,
+                self, config.backends["MyLidarr"], release,
             )
 
         misc.check_announcements(self, config, releases, [])
@@ -78,7 +81,7 @@ class DelayTest(unittest.TestCase):
                 title="title {}".format(i),
                 url="{}: else {}".format(tracker["url"], i),
                 indexer=tracker["name"],
-                backends=[b.name for b in config.backends],
+                backends=config.backends.keys(),
             )
 
             if i % 3 == 0:

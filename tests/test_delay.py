@@ -8,11 +8,14 @@ config = misc.Config(
     config_file="delay.toml",
     irc_channels=[channel],
     irc_users=["bipbopdelayed"],
-    backends=[
-        backends.Backend("delayed_sonarr"),
-        backends.Backend("delayed_lidarr"),
-        backends.Backend("delayed_radarr"),
-    ],
+    backends={
+        b[0]: backends.Backend(b[0], b[1])
+        for b in [
+            ("delayed_sonarr", "delaysonkey"),
+            ("delayed_lidarr", "delaylidkey"),
+            ("delayed_radarr", "delayradkey"),
+        ]
+    },
 )
 
 
@@ -40,7 +43,7 @@ class DelayTest(unittest.TestCase):
             title="title 1",
             url="stuff: stuff 1",
             indexer="Delay",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
@@ -53,13 +56,13 @@ class DelayTest(unittest.TestCase):
         time.sleep(2)
 
         backends.check_rx(
-            self, "delayed_sonarr", release,
+            self, config.backends["delayed_sonarr"], release,
         )
         backends.check_rx(
-            self, "delayed_radarr", release,
+            self, config.backends["delayed_radarr"], release,
         )
         backends.check_rx(
-            self, "delayed_lidarr", release,
+            self, config.backends["delayed_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)

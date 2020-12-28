@@ -10,8 +10,9 @@ tx_lists = {}
 
 
 class Backend:
-    def __init__(self, name, port=None):
+    def __init__(self, name, apikey, port=None):
         self.name = name
+        self.apikey = apikey
         self.thread = None
 
         if port is not None:
@@ -35,14 +36,14 @@ def get_date_diff(release, publish_date):
     return abs((release.announce_time - dt).total_seconds())
 
 
-def check_rx(test_suite, name, release):
+def check_rx(test_suite, backend, release):
     test_suite.assertNotEqual(
-        len(rx_lists[name]), 0, "No announcements to this backend"
+        len(rx_lists[backend.name]), 0, "No announcements to this backend"
     )
-    rx = rx_lists[name].pop(0)
+    rx = rx_lists[backend.name].pop(0)
 
     local_indexer = None
-    if "lidarr" not in name.lower():
+    if "lidarr" not in backend.name.lower():
         local_indexer = "Irc" + release.indexer
     test_suite.assertEqual(release.title, rx["title"], "Title is not matching")
     test_suite.assertEqual(
@@ -53,6 +54,7 @@ def check_rx(test_suite, name, release):
         get_date_diff(release, rx["publishDate"]) < 1, "Publish date is too old"
     )
     test_suite.assertEqual(release.protocol, rx["protocol"], "Protocol is not matching")
+    test_suite.assertEqual(backend.apikey, rx["apikey"], "API key is not matching")
 
 
 def max_announcements(test_suite, name, nr):
@@ -98,6 +100,7 @@ def _run_backend(backend):
         tx_list = get_tx_list(backend.name)
 
         rx_list.append(request.json)
+        rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
         if len(tx_list) == 0:
             return jsonify({"approved": False})
@@ -110,6 +113,7 @@ def _run_backend(backend):
         tx_list = get_tx_list(backend.name)
 
         rx_list.append(request.json)
+        rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
         if len(tx_list) == 0:
             return jsonify({"approved": False})
@@ -148,13 +152,14 @@ def stop():
 
 
 def _create_thread(backend):
-    _backends[backend.name] = backend
     backend.thread = threading.Thread(target=_run_backend, args=(backend,),)
     backend.thread.start()
 
 
 def run(config):
-    for backend in config.backends:
+    global _backends
+    for backend in config.backends.values():
         rx_lists[backend.name] = []
         tx_lists[backend.name] = []
         _create_thread(backend)
+    _backends = config.backends

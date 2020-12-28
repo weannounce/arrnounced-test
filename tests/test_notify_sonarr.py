@@ -8,7 +8,10 @@ config = misc.Config(
     config_file="notify_sonarr.toml",
     irc_channels=[channel],
     irc_users=["bipbopiambot"],
-    backends=[backends.Backend("my_sonarr"), backends.Backend("my_radarr")],
+    backends={
+        b[0]: backends.Backend(b[0], b[1])
+        for b in [("my_sonarr", "abcdef123"), ("my_radarr", "987654321")]
+    },
 )
 
 
@@ -42,7 +45,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.max_announcements(self, "my_radarr", 0)
 
@@ -69,7 +72,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
 
         backends.max_announcements(self, "my_radarr", 0)
@@ -96,7 +99,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
 
         backends.max_announcements(self, "my_radarr", 1)
@@ -125,7 +128,7 @@ class SingleTest(unittest.TestCase):
         release.snatches.append("my_radarr")
 
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)

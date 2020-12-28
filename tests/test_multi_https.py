@@ -7,11 +7,14 @@ config = misc.Config(
     config_file="multi_https.toml",
     irc_channels=[channel],
     irc_users=["bipbopimalsobot"],
-    backends=[
-        backends.Backend("my_sonarr"),
-        backends.Backend("my_lidarr"),
-        backends.Backend("my_radarr"),
-    ],
+    backends={
+        b[0]: backends.Backend(b[0], b[1])
+        for b in [
+            ("my_sonarr", "abcdef123"),
+            ("my_lidarr", "123456789"),
+            ("my_radarr", "987654321"),
+        ]
+    },
 )
 
 
@@ -43,7 +46,7 @@ class SingleTest(unittest.TestCase):
             title="httpstitle",
             url="https://example/dl.php/12345/cfgstr/httpstitle.jpg",
             indexer="Multi",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
@@ -63,13 +66,13 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -90,7 +93,7 @@ class SingleTest(unittest.TestCase):
             title="second multi",
             url="https://example/dl.php/54321/cfgstr/second+multi.jpg",
             indexer="Multi",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["my_sonarr"],
         )
 
@@ -101,7 +104,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.max_announcements(self, "my_radarr", 0)
         backends.max_announcements(self, "my_lidarr", 0)
@@ -120,7 +123,7 @@ class SingleTest(unittest.TestCase):
             title="third",
             url="https://ex/dl.php/99/cfgstr/third.jpg",
             indexer="Multi",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["my_radarr"],
         )
 
@@ -131,7 +134,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.max_announcements(self, "my_sonarr", 1)
         backends.max_announcements(self, "my_lidarr", 1)
@@ -151,7 +154,7 @@ class SingleTest(unittest.TestCase):
         release.snatches.append("my_lidarr")
 
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
         backends.max_announcements(self, "my_sonarr", 1)
         backends.max_announcements(self, "my_radarr", 1)
@@ -174,7 +177,7 @@ class SingleTest(unittest.TestCase):
             title="some title",
             url="https://example/dl.php/1357/cfgstr/some+title.jpg",
             indexer="Multi",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
@@ -182,13 +185,13 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)

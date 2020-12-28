@@ -7,14 +7,17 @@ config = misc.Config(
     config_file="double_backends.toml",
     irc_channels=[channel],
     irc_users=["bipbopsimple1"],
-    backends=[
-        backends.Backend("Sonarr1", 10000),
-        backends.Backend("Sonarr2", 20000),
-        backends.Backend("Radarr1", 7878),
-        backends.Backend("Radarr2", 7879),
-        backends.Backend("Lidarr1", 5000),
-        backends.Backend("Lidarr2", 6000),
-    ],
+    backends={
+        b[0]: backends.Backend(b[0], b[1], b[2])
+        for b in [
+            ("Sonarr1", "sonapikey1", 10000),
+            ("Sonarr2", "sonapikey1", 20000),
+            ("Radarr1", "radapikey1", 7878),
+            ("Radarr2", "radapikey2", 7879),
+            ("Lidarr1", "lidapikey1", 5000),
+            ("Lidarr2", "lidapikey2", 6000),
+        ]
+    },
 )
 
 
@@ -42,12 +45,12 @@ class DelayTest(unittest.TestCase):
             title="a title",
             url="smth: some stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
 
-        for backend in [b.name for b in config.backends]:
+        for backend in config.backends.values():
             backends.check_rx(
                 self, backend, release,
             )
@@ -66,7 +69,7 @@ class DelayTest(unittest.TestCase):
             title="two title",
             url="smth: another stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["Radarr1"],
         )
 
@@ -75,7 +78,7 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "Radarr1", release,
+            self, config.backends["Radarr1"], release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -97,7 +100,7 @@ class DelayTest(unittest.TestCase):
             title="tree title",
             url="smth: the stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["Radarr2"],
         )
 
@@ -106,7 +109,7 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "Radarr2", release,
+            self, config.backends["Radarr2"], release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -128,7 +131,7 @@ class DelayTest(unittest.TestCase):
             title="asdf",
             url="smth: a stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["Sonarr1"],
         )
 
@@ -137,7 +140,7 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "Sonarr1", release,
+            self, config.backends["Sonarr1"], release,
         )
         backends.max_announcements(self, "Sonarr2", 1)
         backends.max_announcements(self, "Radarr1", 1)
@@ -159,7 +162,7 @@ class DelayTest(unittest.TestCase):
             title="qwer",
             url="smth: b stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["Sonarr2"],
         )
 
@@ -168,7 +171,7 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "Sonarr2", release,
+            self, config.backends["Sonarr2"], release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Radarr1", 1)
@@ -190,7 +193,7 @@ class DelayTest(unittest.TestCase):
             title="yuio",
             url="smth: c stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["Lidarr1"],
         )
 
@@ -199,7 +202,7 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "Lidarr1", release,
+            self, config.backends["Lidarr1"], release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -221,7 +224,7 @@ class DelayTest(unittest.TestCase):
             title="yuio",
             url="smth: c stuff",
             indexer="Simple1",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["Lidarr2"],
         )
 
@@ -230,7 +233,7 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "Lidarr2", release,
+            self, config.backends["Lidarr2"], release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)

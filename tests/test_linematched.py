@@ -7,11 +7,14 @@ config = misc.Config(
     config_file="linematched.toml",
     irc_channels=[channel],
     irc_users=["linematcherbot"],
-    backends=[
-        backends.Backend("line_sonarr"),
-        backends.Backend("line_lidarr"),
-        backends.Backend("line_radarr"),
-    ],
+    backends={
+        b[0]: backends.Backend(b[0], b[1])
+        for b in [
+            ("line_sonarr", "lineapison"),
+            ("line_lidarr", "lineapilid"),
+            ("line_radarr", "lineapirad"),
+        ]
+    },
 )
 
 
@@ -39,7 +42,7 @@ class LineMatchedTest(unittest.TestCase):
             title="IF 2%21%3D1 tag1 qwert",
             url="matched: mfix1&_mfix2%26_SetRegex%_SetRegex%25_IS1",
             indexer="Linematched",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
@@ -61,7 +64,7 @@ class LineMatchedTest(unittest.TestCase):
             title="IF 1 tag1 tag2",
             url="matched: mfix1&_mfix2%26_SetRegex_SetRegex_IS1",
             indexer="Linematched",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)

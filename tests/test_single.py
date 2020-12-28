@@ -9,11 +9,14 @@ config = misc.Config(
     web_password="password",
     irc_channels=[channel],
     irc_users=["bipbopiambot"],
-    backends=[
-        backends.Backend("my_sonarr"),
-        backends.Backend("my_lidarr"),
-        backends.Backend("my_radarr"),
-    ],
+    backends={
+        b[0]: backends.Backend(b[0], b[1])
+        for b in [
+            ("my_sonarr", "abcdef123"),
+            ("my_lidarr", "123456789"),
+            ("my_radarr", "987654321"),
+        ]
+    },
 )
 
 
@@ -55,19 +58,19 @@ class SingleTest(unittest.TestCase):
             title="this is a name",
             url="animal: cow &mood=angry f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -84,7 +87,7 @@ class SingleTest(unittest.TestCase):
             title="son snatch",
             url="animal: dog &mood=sad f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["my_sonarr"],
         )
 
@@ -93,7 +96,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
 
         backends.max_announcements(self, "my_radarr", 1)
@@ -112,7 +115,7 @@ class SingleTest(unittest.TestCase):
             title="rad snatch",
             url="animal: cat &mood=happy f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["my_radarr"],
         )
 
@@ -121,7 +124,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
 
         backends.max_announcements(self, "my_sonarr", 1)
@@ -140,7 +143,7 @@ class SingleTest(unittest.TestCase):
             title="lid snatch",
             url="animal: rat &mood=curios f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["my_lidarr"],
         )
 
@@ -149,7 +152,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         backends.max_announcements(self, "my_radarr", 1)
@@ -168,7 +171,7 @@ class SingleTest(unittest.TestCase):
             title="son snatch2",
             url="animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
             snatches=["my_sonarr"],
         )
 
@@ -177,7 +180,7 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
 
         backends.max_announcements(self, "my_radarr", 1)
@@ -198,7 +201,7 @@ class SingleTest(unittest.TestCase):
         release.snatches.append("my_radarr")
 
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -215,7 +218,7 @@ class SingleTest(unittest.TestCase):
             title="title",
             url="animal: some &mood=thing f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
@@ -246,19 +249,19 @@ class SingleTest(unittest.TestCase):
             title="this is some name",
             url="animal: donkey &mood=grumpy f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -275,19 +278,19 @@ class SingleTest(unittest.TestCase):
             title="yet a name",
             url="animal: monkey &mood=frustrated f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
@@ -304,19 +307,19 @@ class SingleTest(unittest.TestCase):
             title="naaame",
             url="animal: bat &mood=splendid f1: first_fixed f2: fixed_second",
             indexer="Single",
-            backends=[b.name for b in config.backends],
+            backends=config.backends.keys(),
         )
 
         irc.announce(release)
 
         backends.check_rx(
-            self, "my_sonarr", release,
+            self, config.backends["my_sonarr"], release,
         )
         backends.check_rx(
-            self, "my_radarr", release,
+            self, config.backends["my_radarr"], release,
         )
         backends.check_rx(
-            self, "my_lidarr", release,
+            self, config.backends["my_lidarr"], release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
