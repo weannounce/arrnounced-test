@@ -17,7 +17,6 @@ apikey = "delaylidkey"
 type = "raDarr"
 apikey = "delayradkey"
 
-# TODO: Test TLS
 [trackers.delay]
 irc_nickname = "bipbopdelayed"
 irc_server = "test_url"

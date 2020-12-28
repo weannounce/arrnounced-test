@@ -1,0 +1,42 @@
+[webui]
+shutdown = true
+
+[log]
+to_file = true
+to_console = false
+
+[backends.Sonarr1]
+url = "http://localhost:10000"
+type = "sonarr"
+apikey = "sonapikey1"
+
+[backends.Sonarr2]
+url = "http://localhost:20000"
+type = "sonarr"
+apikey = "sonapikey1"
+
+[backends.Radarr1]
+type = "radarr"
+apikey = "radapikey1"
+
+[backends.Radarr2]
+url = "http://localhost:7879"
+type = "radarr"
+apikey = "radapikey2"
+
+[backends.Lidarr1]
+url = "http://localhost:5000"
+type = "lidarr"
+apikey = "lidapikey1"
+
+[backends.Lidarr2]
+url = "http://localhost:6000"
+type = "lidarr"
+apikey = "lidapikey2"
+
+[trackers.simple1]
+irc_nickname = "bipbopsimple1"
+irc_server = "192.168.1.10"
+irc_port = 6697
+irc_channels = "#simple1"
+irc_tls = true
