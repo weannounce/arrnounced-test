@@ -20,7 +20,7 @@ irc_nickname = "bipbopiambot"
 irc_server = "192.168.1.10"
 irc_port = 6667
 irc_channels = "#single"
-notify = "my_sonarr"
+notify_backends = "my_sonarr"
 
 [trackers.single.settings]
 fixed1 = "first_fixed"
