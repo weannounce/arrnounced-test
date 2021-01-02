@@ -15,6 +15,11 @@ apikey = "abcdef123"
 type = "radarr"
 apikey = "987654321"
 
+[backends.missing_radarr]
+type = "radarr"
+url = "http://localhost:7880"
+apikey = "987654321"
+
 [trackers.single]
 irc_nickname = "bipbopiambot"
 irc_server = "192.168.1.10"

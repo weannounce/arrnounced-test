@@ -19,6 +19,7 @@ allowed_errors=(
 "WARNING:TRACKER_CONF +- single: Tracker seems to require cookies to download torrent file. Sonarr.Radarr.Lidarr API does not support cookies"
 "WARNING:WEB-UI *- Could not find the requested backend 'nonexistent'"
 "WARNING:IRC:.+ - Unknown command: "
+"ERROR:BACKEND +- missing_radarr ConnectionError: HTTPConnectionPool.host='localhost', port=7880.:.*url: .api.release.push.*Connection refused"
 )
 
 function get_logs()

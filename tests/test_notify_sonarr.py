@@ -83,7 +83,7 @@ class SingleTest(unittest.TestCase):
             self, config, release,
         )
 
-    def test_renotify_radarr(self):
+    def test_renotify_existing_radarr(self):
         release = Release(
             messages=["son snatch2  -  /horsie/ ¤/(- #calm#  -  pasta"],
             channel=channel,
@@ -102,7 +102,7 @@ class SingleTest(unittest.TestCase):
             self, config.backends["my_sonarr"], release,
         )
 
-        backends.max_announcements(self, "my_radarr", 1)
+        backends.max_announcements(self, "my_radarr", 0)
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 1)
 
@@ -137,3 +137,37 @@ class SingleTest(unittest.TestCase):
         misc.check_announced(
             self, config, release,
         )
+
+    def test_renotify_missing_radarr(self):
+        release = Release(
+            messages=["son snatch2  -  /horsie/ ¤/(- #calm#  -  pasta"],
+            channel=channel,
+            title="son snatch2",
+            url="animal: horsie &mood=calm f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=["my_sonarr"],
+        )
+
+        irc.announce(release)
+
+        backends.check_rx(
+            self, config.backends["my_sonarr"], release,
+        )
+
+        backends.max_announcements(self, "my_radarr", 0)
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
+
+        misc.check_announced(
+            self, config, release,
+        )
+
+        browser.renotify(self, config, table_row=1, backend="my_sonarr", success=False)
+
+        # Causes connection refused
+        browser.renotify(
+            self, config, table_row=1, backend="missing_radarr", success=False
+        )
+
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
