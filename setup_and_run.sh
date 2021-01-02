@@ -20,6 +20,8 @@ allowed_errors=(
 "WARNING:WEB-UI *- Could not find the requested backend 'nonexistent'"
 "WARNING:IRC:.+ - Unknown command: "
 "ERROR:BACKEND +- missing_radarr ConnectionError: HTTPConnectionPool.host='localhost', port=7880.:.*url: .api.release.push.*Connection refused"
+"ERROR:MESSAGE_HANDLER +- Database transaction failed"
+"ERROR:MESSAGE_HANDLER +- UnexpectedError: Object Announced.new:1. cannot be stored in the database. OperationalError:"
 )
 
 function get_logs()
