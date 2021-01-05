@@ -64,7 +64,7 @@ def check_announcements(test_suite, config, releases, snatches):
 irc_thread = None
 
 
-def setUpClass(config):
+def setUpClass(config, start_browser=True):
     global irc_thread
     irc_thread = Thread(target=irc.run, args=[config])
     irc_thread.start()
@@ -74,7 +74,8 @@ def setUpClass(config):
     irc.ready_event.wait()
 
     # Browser performs login, wait for everything to start before.
-    browser.init(config)
+    if start_browser:
+        browser.init(config)
 
 
 def tearDownClass(config):

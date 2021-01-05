@@ -64,6 +64,19 @@ def kill(user, reason):
     time.sleep(10)
 
 
+def mode(modes, channel, add=True, user=global_config.irc_nickname):
+    global client
+    global event_loop
+    mode_string = ("+{}" if add else "-{}").format("".join(modes))
+    asyncio.run_coroutine_threadsafe(
+        client.rawmsg(
+            "SAMODE", channel, mode_string, *[user for i in range(len(modes))]
+        ),
+        event_loop,
+    )
+    time.sleep(0.2)
+
+
 class IRC(BotBase):
     def __init__(self, nickname, channel, event_loop):
         super().__init__(nickname, eventloop=event_loop)

@@ -142,5 +142,6 @@ def init(config):
 
 def stop():
     global browser
-    browser.close()
-    browser = None
+    if browser is not None:
+        browser.close()
+        browser = None
