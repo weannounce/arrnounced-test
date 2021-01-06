@@ -17,7 +17,7 @@ allowed_errors=(
 "WARNING:ANNOUNCEMENT +- VarReplace: Could not replace, variable 'extract5' not found"
 "WARNING:ANNOUNCE_PARSER +- Single: No match found for 'this is a name  -  cow. ¤..- #angry#  -  pasta and sauce'"
 "WARNING:MANAGER +- single: Tracker seems to require cookies to download torrent files. Sonarr.Radarr.Lidarr API does not support cookies"
-"WARNING:WEB-UI *- Could not find the requested backend 'nonexistent'"
+"WARNING:WEB-HANDLER *- Could not find the requested backend 'nonexistent'"
 "WARNING:IRC:.+ - Unknown command: "
 "ERROR:BACKEND +- missing_radarr ConnectionError: HTTPConnectionPool.host='localhost', port=7880.:.*url: .api.release.push.*Connection refused"
 "ERROR:MESSAGE_HANDLER +- Database transaction failed"
