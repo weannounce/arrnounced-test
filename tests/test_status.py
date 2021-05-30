@@ -44,6 +44,7 @@ class StatusTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         misc.setUpClass(config)
+        browser.get_status(config)
 
     @classmethod
     def tearDownClass(self):
@@ -53,29 +54,70 @@ class StatusTest(unittest.TestCase):
     def setUp(self):
         backends.clear_all_backends()
         db.clear_db()
+        print("------------------")
 
     def tearDown(self):
         web.logout()
 
-    def test_kill_client(self):
+    #def test_kill_client(self):
+    #    ts = TrackerStatus("simple1", "Simple1 Announcement", ["#simple1"])
+    #    print("KILL test")
+    #    #browser.get_status(config)
+
+    #    #browser.check_tracker_status(self, ts)
+    #    browser.print_tracker_status(self, ts)
+    #    irc.kill("bipbopstatus1", "High treason")
+    #    ts.connected = False
+    #    #browser.check_tracker_status(self, ts)
+    #    browser.print_tracker_status(self, ts)
+    #    time.sleep(7)
+    #    ts.connected = True
+    #    #browser.check_tracker_status(self, ts)
+    #    browser.print_tracker_status(self, ts)
+
+    #def test_kick_client(self):
+    #    ts = TrackerStatus("simple3", "Simple3 Announcement", ["#simple3"])
+    #    print("KICK test")
+    #    #browser.get_status(config)
+    #    browser.print_tracker_status(self, ts)
+    #    irc.kick("bipbopstatus3", ts.channels[0], "Medium treason")
+    #    browser.print_tracker_status(self, ts)
+    #    irc.join("bipbopstatus3", ts.channels[0])
+    #    browser.print_tracker_status(self, ts)
+
+    #def test_part_client(self):
+    #    ts = TrackerStatus("simple2", "Simple2 Announcement", ["#simple2"])
+    #    print("PART test")
+    #    #browser.get_status(config)
+    #    browser.print_tracker_status(self, ts)
+    #    irc.part("bipbopstatus2", ts.channels[0], "Low treason")
+    #    browser.print_tracker_status(self, ts)
+    #    irc.join("bipbopstatus2", ts.channels[0])
+    #    browser.print_tracker_status(self, ts)
+
+    #def test_join_two(self):
+    #    ts = TrackerStatus("simple2", "Simple2 Announcement", ["#simple2"])
+    #    print("JOIN 2 test")
+    #    browser.print_tracker_status(self, ts)
+    #    irc.join("bipbopstatus2", "#single")
+    #    browser.print_tracker_status(self, ts)
+    #    irc.kick("bipbopstatus2", ts.channels[0], "Come again")
+    #    browser.print_tracker_status(self, ts)
+
+    def test_banned(self):
         ts = TrackerStatus("simple1", "Simple1 Announcement", ["#simple1"])
-        browser.get_status(config)
+        irc.mode("o", ts.channels[0])
+        print("BANNED test")
+        irc.ban("bipbopstatus1", ts.channels[0], True)
 
-        browser.check_tracker_status(self, ts)
-        irc.kill("bipbopstatus1", "High treason")
-        ts.connected = False
-        browser.check_tracker_status(self, ts)
-        time.sleep(5)
-        ts.connected = True
-        browser.check_tracker_status(self, ts)
+        browser.print_tracker_status(self, ts)
+        irc.part("bipbopstatus1", ts.channels[0], "you may leave")
+        browser.print_tracker_status(self, ts)
+        irc.invite("bipbopstatus1", ts.channels[0])
+        browser.print_tracker_status(self, ts)
+        irc.ban("bipbopstatus1", ts.channels[0], False)
 
-    # def test_kick_client(self):
-    #    irc.kick(irc_user, channel, "Medium treason")
-    #    irc.join(irc_user, channel)
-
-    def test_part_client(self):
-        irc.part("bipbopstatus2", "#simple2", "Low treason")
-        irc.join("bipbopstatus2", "#simple2")
+        irc.mode("o", ts.channels[0], False)
 
     # def test_snatches(self):
 

@@ -64,6 +64,12 @@ def kill(user, reason):
     time.sleep(0.1)
 
 
+def ban(user, channel, set_ban):
+    if not set_ban:
+        user = user + "!*@*"
+    mode("b", channel, set_ban, user)
+
+
 def mode(modes, channel, add=True, user=global_config.irc_nickname):
     global client
     global event_loop
@@ -76,6 +82,15 @@ def mode(modes, channel, add=True, user=global_config.irc_nickname):
     )
     time.sleep(0.2)
 
+
+def invite(user, channel):
+    asyncio.run_coroutine_threadsafe(
+        client.rawmsg(
+            "INVITE", user, channel,
+        ),
+        event_loop,
+    )
+    time.sleep(0.2)
 
 class IRC(BotBase):
     def __init__(self, nickname, channel, event_loop):

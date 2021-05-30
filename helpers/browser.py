@@ -208,6 +208,19 @@ def get_status(config):
     browser.get("http://localhost:" + str(config.web_port) + "/status")
 
 
+def print_tracker_status(test_suite, tracker_status):
+    global browser
+    cells = browser.find_element_by_id(
+        "indexer_" + tracker_status.type
+    ).find_elements_by_tag_name("td")
+    print("--- Status:")
+    for i, c in enumerate(cells):
+        print(i, ": ", c.text)
+    # test_suite.assertEqual(len(cells), 5)
+    # test_suite.assertEqual(cells[0].text, tracker_status.name)
+    # test_suite.assertEqual(cells[1].text, "Yes" if tracker_status.connected else "No")
+
+
 def check_tracker_status(test_suite, tracker_status):
     global browser
     cells = browser.find_element_by_id(
