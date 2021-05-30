@@ -25,7 +25,8 @@ apikey = "987654321"
 irc_nickname = "bipbopiambot"
 irc_server = "192.168.1.10"
 irc_port = 6667
-irc_channels = "#single"
+# Test that capital letters work
+irc_channels = "#Single"
 
 [trackers.single.settings]
 fixed1 = "first_fixed"
