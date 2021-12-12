@@ -23,6 +23,7 @@ allowed_errors=(
 "ERROR:MESSAGE_HANDLER +- Database transaction failed"
 "ERROR:MESSAGE_HANDLER +- UnexpectedError: Object Announced.new:1. cannot be stored in the database. OperationalError:"
 )
+RET=0
 
 function get_logs()
 {
@@ -43,7 +44,7 @@ fi
 echo "Removing old log files"
 rm -vrf data/*.log*
 
-./run_tests.py "$@"
+./run_tests.py "$@" || RET=1
 coverage combine
 coverage html
 
@@ -54,3 +55,5 @@ then
   echo "Found error logs:"
   echo "$error_logs"
 fi
+
+exit "$RET"
