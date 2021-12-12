@@ -82,7 +82,7 @@ def check_announcements(test_suite, releases):
         test_suite.assertEqual(
             len(release.snatches),
             len(announcement.snatched),
-            "Snatched incorrect amount of times",
+            f"Snatched incorrect amount of times: {release.title}",
         )
         for snatch in announcement.snatched:
             test_suite.assertTrue(

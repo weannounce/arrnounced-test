@@ -24,6 +24,7 @@ def stop(config):
         else:
             subprocess.Popen(["docker", "container", "stop", container_name]).wait()
     else:
+        print("Waiting for shutdown...")
         arr_process.wait()
 
 
