@@ -22,7 +22,7 @@ config = misc.Config(
 )
 
 
-class DelayTest(unittest.TestCase):
+class PagesTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         misc.setUpClass(config)

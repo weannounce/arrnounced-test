@@ -19,7 +19,7 @@ config = misc.Config(
 )
 
 
-class DelayTest(unittest.TestCase):
+class TransactionErrorTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         misc.setUpClass(config)
