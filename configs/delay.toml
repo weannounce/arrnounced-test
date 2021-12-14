@@ -19,7 +19,7 @@ apikey = "delayradkey"
 
 [trackers.delay]
 irc_nickname = "bipbopdelayed"
-irc_server = "test_url"
+irc_server = "test-url"
 irc_port = 6667
 irc_channels = "#delay"
 
