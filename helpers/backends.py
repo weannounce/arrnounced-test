@@ -75,6 +75,10 @@ def send_approved(name, approved):
     tx_lists[name].append({"approved": approved})
 
 
+def send_raw(name, broken_json):
+    tx_lists[name].append(broken_json)
+
+
 def clear_all_backends():
     for b in rx_lists.keys():
         rx_lists[b] = []

@@ -328,3 +328,26 @@ class SingleTest(unittest.TestCase):
         misc.check_announced(
             self, config, release,
         )
+
+    def test_broken_json_backend_reply(self):
+        release = Release(
+            messages=["name this is  -  /tiger/ ¤/(- #lazy#  -  pasta and sauce"],
+            channel=channel,
+            title="name this is",
+            url="animal: tiger &mood=lazy f1: first_fixed f2: fixed_second",
+            indexer="Single",
+            backends=config.backends.keys(),
+        )
+
+        backends.send_raw("my_sonarr", "{'apr': some")
+        backends.send_raw("my_radarr", "broken")
+        backends.send_raw("my_lidarr", "{'approved': 'asdf'}")
+
+        irc.announce(release)
+
+        self.assertEqual(db.nr_announcements(), 1)
+        self.assertEqual(db.nr_snatches(), 0)
+
+        misc.check_announced(
+            self, config, release,
+        )
