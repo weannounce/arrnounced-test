@@ -27,7 +27,7 @@ RET=0
 
 function get_logs()
 {
-  logs="$(cat data/*.log* | grep -iE "warning|error|exception|backtrace|traceback|throw")"
+  logs="$(cat data/*.log* | grep -iE "warning|error|exception|backtrace|traceback|throw|task pending")"
   for l in "${allowed_errors[@]}";
   do
     logs="$(echo "$logs" | sed -re "/$l/d")"
