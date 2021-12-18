@@ -7,9 +7,9 @@ function get_logs()
   cat data/*.log* | grep -iE "$find_errors" | ./filter_logs.py
 }
 
-if [ ! -f "../arrnounced/src/arrnounced.py" ]
+if ! [[ $VIRTUAL_ENV =~ arrnounced-test ]]
 then
-  echo "Run script from test repo root"
+  echo "Must run in poetry virtual env (poetry run ./setup_and_run.sh)"
   exit 1
 fi
 
