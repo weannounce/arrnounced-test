@@ -115,10 +115,15 @@ def _run_backend(backend):
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
         if len(tx_list) != 0:
-            return jsonify(tx_list.pop(0))
+            app = tx_list.pop(0)
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
         elif request.json["title"] in tx_dict:
-            return jsonify(tx_dict.pop(request.json["title"]))
+            app = tx_dict.pop(request.json["title"])
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
         else:
+            # print(backend.name, "got", rx_list[-1]["title"], ": False")
             return jsonify({"approved": False})
 
     @app.route("/api/v1/release/push", methods=["POST"])
@@ -131,10 +136,15 @@ def _run_backend(backend):
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
         if len(tx_list) != 0:
-            return jsonify(tx_list.pop(0))
+            app = tx_list.pop(0)
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
         elif request.json["title"] in tx_dict:
-            return jsonify(tx_dict.pop(request.json["title"]))
+            app = tx_dict.pop(request.json["title"])
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
         else:
+            # print(backend.name, "got", rx_list[-1]["title"], ": False")
             return jsonify({"approved": False})
 
     @app.route("/shutdown")
