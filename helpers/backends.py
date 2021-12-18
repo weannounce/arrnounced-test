@@ -7,6 +7,7 @@ from datetime import datetime
 
 rx_lists = {}
 tx_lists = {}
+tx_dicts = {}
 
 
 class Backend:
@@ -75,8 +76,8 @@ def send_approved(name, approved):
     tx_lists[name].append({"approved": approved})
 
 
-def send_raw(name, broken_json):
-    tx_lists[name].append(broken_json)
+def send_approved_title(name, release, approved):
+    tx_dicts[name][release.title] = {"approved": approved}
 
 
 def clear_all_backends():
@@ -84,10 +85,16 @@ def clear_all_backends():
         rx_lists[b] = []
     for b in tx_lists.keys():
         tx_lists[b] = []
+    for b in tx_dicts.keys():
+        tx_lists[b] = {}
 
 
 def get_tx_list(backend_name):
     return tx_lists[backend_name]
+
+
+def get_tx_dict(backend_name):
+    return tx_dicts[backend_name]
 
 
 def get_rx_list(backend_name):
@@ -102,27 +109,33 @@ def _run_backend(backend):
     def push():
         rx_list = get_rx_list(backend.name)
         tx_list = get_tx_list(backend.name)
+        tx_dict = get_tx_dict(backend.name)
 
         rx_list.append(request.json)
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
-        if len(tx_list) == 0:
-            return jsonify({"approved": False})
-        else:
+        if len(tx_list) != 0:
             return jsonify(tx_list.pop(0))
+        elif request.json["title"] in tx_dict:
+            return jsonify(tx_dict.pop(request.json["title"]))
+        else:
+            return jsonify({"approved": False})
 
     @app.route("/api/v1/release/push", methods=["POST"])
     def push_v1():
         rx_list = get_rx_list(backend.name)
         tx_list = get_tx_list(backend.name)
+        tx_dict = get_tx_dict(backend.name)
 
         rx_list.append(request.json)
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
-        if len(tx_list) == 0:
-            return jsonify({"approved": False})
-        else:
+        if len(tx_list) != 0:
             return jsonify(tx_list.pop(0))
+        elif request.json["title"] in tx_dict:
+            return jsonify(tx_dict.pop(request.json["title"]))
+        else:
+            return jsonify({"approved": False})
 
     @app.route("/shutdown")
     def shutdown():
@@ -143,6 +156,7 @@ def stop():
     global _backends
     global rx_lists
     global tx_lists
+    global tx_dicts
     for b in _backends.keys():
         if _backends[b].thread is not None:
             if not _call_shutdown(_backends[b].port):
@@ -153,10 +167,14 @@ def stop():
     _backends = {}
     rx_lists = {}
     tx_lists = {}
+    tx_dicts = {}
 
 
 def _create_thread(backend):
-    backend.thread = threading.Thread(target=_run_backend, args=(backend,),)
+    backend.thread = threading.Thread(
+        target=_run_backend,
+        args=(backend,),
+    )
     backend.thread.start()
 
 
@@ -165,5 +183,6 @@ def run(config):
     for backend in config.backends.values():
         rx_lists[backend.name] = []
         tx_lists[backend.name] = []
+        tx_dicts[backend.name] = {}
         _create_thread(backend)
     _backends = config.backends
