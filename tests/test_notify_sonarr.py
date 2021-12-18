@@ -44,8 +44,10 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
         backends.max_announcements(self, "my_radarr", 0)
 
@@ -53,7 +55,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_sonarr_snatch(self):
@@ -71,8 +75,10 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
 
         backends.max_announcements(self, "my_radarr", 0)
@@ -80,7 +86,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_renotify_existing_radarr(self):
@@ -98,8 +106,10 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
 
         backends.max_announcements(self, "my_radarr", 0)
@@ -107,7 +117,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
         backends.send_approved("my_radarr", True)
@@ -127,15 +139,19 @@ class SingleTest(unittest.TestCase):
 
         release.snatches.append("my_radarr")
 
-        backends.check_rx(
-            self, config.backends["my_radarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_radarr"],
+            release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 2)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_renotify_missing_radarr(self):
@@ -150,8 +166,10 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
 
         backends.max_announcements(self, "my_radarr", 0)
@@ -159,7 +177,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
         browser.renotify(self, config, table_row=1, backend="my_sonarr", success=False)

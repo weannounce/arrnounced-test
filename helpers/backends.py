@@ -37,12 +37,24 @@ def get_date_diff(release, publish_date):
     return abs((release.announce_time - dt).total_seconds())
 
 
-def check_rx(test_suite, backend, release):
+def check_first_rx(test_suite, backend, release):
     test_suite.assertNotEqual(
         len(rx_lists[backend.name]), 0, "No announcements to this backend"
     )
     rx = rx_lists[backend.name].pop(0)
+    _check_rx(test_suite, backend, rx, release)
 
+
+def find_and_check_rx(test_suite, backend, release):
+    test_suite.assertNotEqual(
+        len(rx_lists[backend.name]), 0, "No announcements to this backend"
+    )
+    rx = next(filter(lambda x: x["title"] == release.title, rx_lists[backend.name]))
+    rx_lists[backend.name].remove(rx)
+    _check_rx(test_suite, backend, rx, release)
+
+
+def _check_rx(test_suite, backend, rx, release):
     local_indexer = None
     if "lidarr" not in backend.name.lower():
         local_indexer = "Irc" + release.indexer
@@ -86,7 +98,7 @@ def clear_all_backends():
     for b in tx_lists.keys():
         tx_lists[b] = []
     for b in tx_dicts.keys():
-        tx_lists[b] = {}
+        tx_dicts[b] = {}
 
 
 def get_tx_list(backend_name):

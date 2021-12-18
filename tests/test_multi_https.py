@@ -65,21 +65,29 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
-        backends.check_rx(
-            self, config.backends["my_radarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_radarr"],
+            release,
         )
-        backends.check_rx(
-            self, config.backends["my_lidarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_lidarr"],
+            release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_sonarr_snatch(self):
@@ -103,8 +111,10 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
         backends.max_announcements(self, "my_radarr", 0)
         backends.max_announcements(self, "my_lidarr", 0)
@@ -113,7 +123,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_renotify_lidarr(self):
@@ -133,8 +145,10 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_radarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_radarr"],
+            release,
         )
         backends.max_announcements(self, "my_sonarr", 1)
         backends.max_announcements(self, "my_lidarr", 1)
@@ -143,7 +157,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
         backends.send_approved("my_lidarr", True)
@@ -153,8 +169,10 @@ class SingleTest(unittest.TestCase):
 
         release.snatches.append("my_lidarr")
 
-        backends.check_rx(
-            self, config.backends["my_lidarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_lidarr"],
+            release,
         )
         backends.max_announcements(self, "my_sonarr", 1)
         backends.max_announcements(self, "my_radarr", 1)
@@ -163,7 +181,9 @@ class SingleTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 2)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_non_capture_with_match(self):
@@ -184,19 +204,27 @@ class SingleTest(unittest.TestCase):
         irc.announce(release)
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["my_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_sonarr"],
+            release,
         )
-        backends.check_rx(
-            self, config.backends["my_radarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_radarr"],
+            release,
         )
-        backends.check_rx(
-            self, config.backends["my_lidarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["my_lidarr"],
+            release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )

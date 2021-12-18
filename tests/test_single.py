@@ -63,17 +63,17 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_sonarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_radarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_lidarr"],
             release,
@@ -103,7 +103,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_sonarr"],
             release,
@@ -135,7 +135,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_radarr"],
             release,
@@ -167,7 +167,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_lidarr"],
             release,
@@ -199,7 +199,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_sonarr"],
             release,
@@ -224,7 +224,7 @@ class SingleTest(unittest.TestCase):
 
         release.snatches.append("my_radarr")
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_radarr"],
             release,
@@ -284,17 +284,17 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_sonarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_radarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_lidarr"],
             release,
@@ -321,17 +321,17 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_sonarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_radarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_lidarr"],
             release,
@@ -358,17 +358,17 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_sonarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_radarr"],
             release,
         )
-        backends.check_rx(
+        backends.check_first_rx(
             self,
             config.backends["my_lidarr"],
             release,

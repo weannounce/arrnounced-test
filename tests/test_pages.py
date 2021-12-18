@@ -57,17 +57,17 @@ class PagesTest(unittest.TestCase):
             releases.append(release)
 
         for release in releases:
-            backends.check_rx(
+            backends.find_and_check_rx(
                 self,
                 config.backends["MySonarr"],
                 release,
             )
-            backends.check_rx(
+            backends.find_and_check_rx(
                 self,
                 config.backends["MyRadarr"],
                 release,
             )
-            backends.check_rx(
+            backends.find_and_check_rx(
                 self,
                 config.backends["MyLidarr"],
                 release,

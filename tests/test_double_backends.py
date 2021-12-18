@@ -51,15 +51,19 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
 
         for backend in config.backends.values():
-            backends.check_rx(
-                self, backend, release,
+            backends.check_first_rx(
+                self,
+                backend,
+                release,
             )
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_radarr1_snatch(self):
@@ -77,8 +81,10 @@ class DelayTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["Radarr1"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["Radarr1"],
+            release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -90,7 +96,9 @@ class DelayTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_radarr2_snatch(self):
@@ -108,8 +116,10 @@ class DelayTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["Radarr2"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["Radarr2"],
+            release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -121,7 +131,9 @@ class DelayTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_sonarr1_snatch(self):
@@ -139,8 +151,10 @@ class DelayTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["Sonarr1"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["Sonarr1"],
+            release,
         )
         backends.max_announcements(self, "Sonarr2", 1)
         backends.max_announcements(self, "Radarr1", 1)
@@ -152,7 +166,9 @@ class DelayTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_sonarr2_snatch(self):
@@ -170,8 +186,10 @@ class DelayTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["Sonarr2"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["Sonarr2"],
+            release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Radarr1", 1)
@@ -183,7 +201,9 @@ class DelayTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_lidarr1_snatch(self):
@@ -201,8 +221,10 @@ class DelayTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["Lidarr1"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["Lidarr1"],
+            release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -214,7 +236,9 @@ class DelayTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_lidarr2_snatch(self):
@@ -232,8 +256,10 @@ class DelayTest(unittest.TestCase):
 
         irc.announce(release)
 
-        backends.check_rx(
-            self, config.backends["Lidarr2"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["Lidarr2"],
+            release,
         )
         backends.max_announcements(self, "Sonarr1", 1)
         backends.max_announcements(self, "Sonarr2", 1)
@@ -245,5 +271,7 @@ class DelayTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 1)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )

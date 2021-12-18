@@ -55,19 +55,27 @@ class DelayTest(unittest.TestCase):
 
         time.sleep(2)
 
-        backends.check_rx(
-            self, config.backends["delayed_sonarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["delayed_sonarr"],
+            release,
         )
-        backends.check_rx(
-            self, config.backends["delayed_radarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["delayed_radarr"],
+            release,
         )
-        backends.check_rx(
-            self, config.backends["delayed_lidarr"], release,
+        backends.check_first_rx(
+            self,
+            config.backends["delayed_lidarr"],
+            release,
         )
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
