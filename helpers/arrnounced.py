@@ -1,6 +1,7 @@
 import requests
 import subprocess
 import os
+import shutil
 from helpers import config as global_config
 
 container_name = "arrnounced_test"
@@ -38,8 +39,8 @@ def run(config):
                 "run",
                 "-p",
                 "--source",
-                "../arrnounced/src",
-                "../arrnounced/src/arrnounced.py",
+                "../arrnounced/arrnounced",
+                str(shutil.which("arrnounced")),
                 "-v",
                 "-c",
                 "configs/" + config.config_file,
