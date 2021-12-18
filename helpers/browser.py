@@ -35,7 +35,9 @@ def _check_toastr(test_suite, backend, success):
     )
 
     test_suite.assertEqual(
-        toastr.text, backend + toastr_text, "Toastr text not ok",
+        toastr.text,
+        backend + toastr_text,
+        "Toastr text not ok",
     )
 
     time.sleep(7)
@@ -112,8 +114,8 @@ def check_snatches(test_suite, releases):
 
         cells = row.find_elements_by_tag_name("td")
         test_suite.assertEqual(len(cells), 4)
-        test_suite.assertEqual(cells[1].text, release.indexer)
         test_suite.assertEqual(cells[2].text, release.title)
+        test_suite.assertEqual(cells[1].text, release.indexer)
         test_suite.assertEqual(cells[3].text, release.snatches[-1])
 
 
