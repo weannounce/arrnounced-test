@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -64,9 +65,12 @@ def _get_next_row(rows, pager_id, table_id):
     if rows is None:
         rows = []
     elif len(rows) == 0:
-        browser.find_element_by_xpath(
-            "//*[@id='{}']/li/a[text()='Next']".format(pager_id)
-        ).click()
+        try:
+            browser.find_element_by_xpath(
+                f"//*[@id='{pager_id}']/li[@class='page-item next']/a[text()='Next']"
+            ).click()
+        except NoSuchElementException:
+            return None, []
 
     if len(rows) == 0:
         rows = (
@@ -75,7 +79,7 @@ def _get_next_row(rows, pager_id, table_id):
             .find_elements_by_tag_name("tr")
         )
 
-    row = rows.pop(0)
+    row = rows.pop(0) if rows else None
 
     return (row, rows)
 
@@ -105,12 +109,41 @@ def check_announcements(test_suite, config, releases):
         )
 
 
+def check_unordered_snatches(test_suite, releases):
+    # This function does not handle releases snatched several times
+    row_count = 0
+    release_count = len(releases)
+    rows = None
+    row, rows = _get_snatch_row(rows)
+
+    while row:
+        cells = row.find_elements_by_tag_name("td")
+        release = next(filter(lambda x: x.title == cells[2].text, releases), None)
+        test_suite.assertNotEqual(
+            release, None, f"Row title '{cells[2].text}' was not found among releases"
+        )
+        releases.remove(release)
+
+        test_suite.assertEqual(len(cells), 4)
+        test_suite.assertEqual(cells[2].text, release.title)
+        test_suite.assertEqual(cells[1].text, release.indexer)
+        test_suite.assertEqual(cells[3].text, release.snatches[-1])
+
+        row_count += 1
+        row, rows = _get_snatch_row(rows)
+
+    test_suite.assertEqual(
+        row_count, release_count, "Found table rows is not equal to releases"
+    )
+
+
 def check_snatches(test_suite, releases):
     rows = None
     for release in reversed(releases):
         if len(release.snatches) == 0:
             continue
-        (row, rows) = _get_snatch_row(rows)
+        row, rows = _get_snatch_row(rows)
+        test_suite.assertNotEqual(row, None)
 
         cells = row.find_elements_by_tag_name("td")
         test_suite.assertEqual(len(cells), 4)

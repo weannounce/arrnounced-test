@@ -46,7 +46,8 @@ class Release:
 
 def check_announced(test_suite, config, release):
     db.check_announced(
-        test_suite, release,
+        test_suite,
+        release,
     )
 
     browser.check_announced(test_suite, config, release)
@@ -54,11 +55,12 @@ def check_announced(test_suite, config, release):
 
 def check_announcements(test_suite, config, releases, snatches):
     db.check_announcements(
-        test_suite, releases,
+        test_suite,
+        releases,
     )
 
     browser.check_announcements(test_suite, config, releases)
-    browser.check_snatches(test_suite, snatches)
+    browser.check_unordered_snatches(test_suite, snatches)
 
 
 irc_thread = None
