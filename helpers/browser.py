@@ -104,7 +104,9 @@ def check_unordered_announcements(test_suite, config, releases):
     # This function does not handle releases with the same title
     row_count = 0
     release_count = len(releases)
-    releases.reverse()
+
+    releases_copy = releases.copy()
+    releases_copy.reverse()
 
     _get_main(config)
     rows = None
@@ -112,11 +114,11 @@ def check_unordered_announcements(test_suite, config, releases):
 
     while row:
         cells = row.find_elements_by_tag_name("td")
-        release = next(filter(lambda x: x.title == cells[2].text, releases), None)
+        release = next(filter(lambda x: x.title == cells[2].text, releases_copy), None)
         test_suite.assertNotEqual(
             release, None, f"Row title '{cells[2].text}' was not found among releases"
         )
-        releases.remove(release)
+        releases_copy.remove(release)
         _check_announcement_cells(test_suite, cells, release)
 
         row_count += 1
@@ -149,18 +151,20 @@ def check_unordered_snatches(test_suite, releases):
     # This function does not handle releases snatched several times
     row_count = 0
     release_count = len(releases)
-    releases.reverse()
+
+    releases_copy = releases.copy()
+    releases_copy.reverse()
 
     rows = None
     row, rows = _get_snatch_row(rows)
 
     while row:
         cells = row.find_elements_by_tag_name("td")
-        release = next(filter(lambda x: x.title == cells[2].text, releases), None)
+        release = next(filter(lambda x: x.title == cells[2].text, releases_copy), None)
         test_suite.assertNotEqual(
             release, None, f"Row title '{cells[2].text}' was not found among releases"
         )
-        releases.remove(release)
+        releases_copy.remove(release)
 
         _check_snatch_cells(test_suite, cells, release)
 
