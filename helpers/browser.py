@@ -10,13 +10,11 @@ browser = None
 def renotify(test_suite, config, table_row, backend, success):
     _get_main(config)
     action_div = browser.find_element_by_xpath(
-        "//*[@id='announced_torrents']/table/tbody/tr[{}]/td[5]/div".format(table_row)
+        f"//*[@id='announced_torrents']/table/tbody/tr[{table_row}]/td[5]/div"
     )
     dropdown = action_div.find_element_by_xpath("a[@href='#']")
     dropdown.click()
-    renotify_link = action_div.find_element_by_xpath(
-        "ul/li/a[text()='{}']".format(backend)
-    )
+    renotify_link = action_div.find_element_by_xpath(f"ul/li/a[text()='{backend}']")
     renotify_link.click()
 
     time.sleep(0.5)

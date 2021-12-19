@@ -9,7 +9,11 @@ from helpers import config
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run Arrnounced integration tests")
     parser.add_argument(
-        "-d", "--docker", type=str, help="Run docker image", default=None,
+        "-d",
+        "--docker",
+        type=str,
+        help="Run docker image",
+        default=None,
     )
     parser.add_argument(
         "test", type=str, help="Which tests to run", nargs="?", default="*"
@@ -24,7 +28,7 @@ if __name__ == "__main__":
     config.docker = args.docker
 
     suite = unittest.TestLoader().discover(
-        start_dir="tests", pattern="test_{}.py".format(args.test)
+        start_dir="tests", pattern=f"test_{args.test}.py"
     )
     result = unittest.TextTestRunner().run(suite)
 

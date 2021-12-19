@@ -15,10 +15,7 @@ def stop(config):
     global arr_process
     print("Stopping Arrnounced")
 
-    if (
-        requests.get("http://localhost:{}/shutdown".format(config.web_port)).status_code
-        != 200
-    ):
+    if requests.get(f"http://localhost:{config.web_port}/shutdown").status_code != 200:
         print("Failed to shutdown Arrnounced. Killing instead!")
         if global_config.docker is None:
             arr_process.kill()

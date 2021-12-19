@@ -175,7 +175,7 @@ def _run_backend(backend):
 
 
 def _call_shutdown(port):
-    return requests.get("http://localhost:{}/shutdown".format(port)).status_code == 200
+    return requests.get(f"http://localhost:{port}/shutdown").status_code == 200
 
 
 def stop():

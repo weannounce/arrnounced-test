@@ -45,10 +45,10 @@ class PagesTest(unittest.TestCase):
         for i in range(90):
             tracker = trackers[i % 3]
             release = Release(
-                messages=["title {} : something {}".format(i, i)],
+                messages=[f"title {i} : something {i}"],
                 channel=tracker["channel"],
-                title="title {}".format(i),
-                url="{}: something {}".format(tracker["url"], i),
+                title=f"title {i}",
+                url=f"{tracker['url']}: something {i}",
                 indexer=tracker["name"],
                 backends=config.backends.keys(),
             )
@@ -82,10 +82,10 @@ class PagesTest(unittest.TestCase):
         for i in range(90):
             tracker = trackers[i % 3]
             release = Release(
-                messages=["title {} : else {}".format(i, i)],
+                messages=[f"title {i} : else {i}"],
                 channel=tracker["channel"],
-                title="title {}".format(i),
-                url="{}: else {}".format(tracker["url"], i),
+                title=f"title {i}",
+                url=f"{tracker['url']}: else {i}",
                 indexer=tracker["name"],
                 backends=config.backends.keys(),
             )
