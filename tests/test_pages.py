@@ -53,7 +53,7 @@ class PagesTest(unittest.TestCase):
                 backends=config.backends.keys(),
             )
 
-            irc.announce(release, wait=0.3)
+            irc.announce(release, wait=0.1)
             releases.append(release)
 
         for release in releases:
@@ -102,7 +102,7 @@ class PagesTest(unittest.TestCase):
                 backends.send_approved_title("MyLidarr", release, True)
                 release.snatches.append("MyLidarr")
                 snatches.append(release)
-            irc.announce(release, wait=0.3)
+            irc.announce(release, wait=0.1)
             releases.append(release)
 
         backends.max_announcements(self, "MySonarr", 90)

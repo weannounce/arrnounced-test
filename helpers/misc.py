@@ -59,7 +59,7 @@ def check_announcements(test_suite, config, releases, snatches):
         releases,
     )
 
-    browser.check_announcements(test_suite, config, releases)
+    browser.check_unordered_announcements(test_suite, config, releases)
     browser.check_unordered_snatches(test_suite, snatches)
 
 
