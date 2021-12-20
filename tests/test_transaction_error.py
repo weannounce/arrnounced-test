@@ -19,7 +19,7 @@ config = misc.Config(
 )
 
 
-class DelayTest(unittest.TestCase):
+class TransactionErrorTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         misc.setUpClass(config)
@@ -38,7 +38,7 @@ class DelayTest(unittest.TestCase):
 
     def test_database_transaction_error(self):
         release = Release(
-            messages=["database transaction : some stuff"],
+            messages=["database transaction title : some stuff"],
             channel=channel,
             title="database transaction",
             url="smth: some stuff",
@@ -51,15 +51,9 @@ class DelayTest(unittest.TestCase):
         irc.announce(release)
         os.rename("data/brain.db.tmp", "data/brain.db")
 
-        backends.check_rx(
-            self, config.backends["MySonarr"], release,
-        )
-        backends.check_rx(
-            self, config.backends["MyRadarr"], release,
-        )
-        backends.check_rx(
-            self, config.backends["MyLidarr"], release,
-        )
+        backends.max_announcements(self, "MySonarr", 0)
+        backends.max_announcements(self, "MyRadarr", 0)
+        backends.max_announcements(self, "MyLidarr", 0)
 
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)

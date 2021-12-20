@@ -7,6 +7,7 @@ from datetime import datetime
 
 rx_lists = {}
 tx_lists = {}
+tx_dicts = {}
 
 
 class Backend:
@@ -36,12 +37,24 @@ def get_date_diff(release, publish_date):
     return abs((release.announce_time - dt).total_seconds())
 
 
-def check_rx(test_suite, backend, release):
+def check_first_rx(test_suite, backend, release):
     test_suite.assertNotEqual(
         len(rx_lists[backend.name]), 0, "No announcements to this backend"
     )
     rx = rx_lists[backend.name].pop(0)
+    _check_rx(test_suite, backend, rx, release)
 
+
+def find_and_check_rx(test_suite, backend, release):
+    test_suite.assertNotEqual(
+        len(rx_lists[backend.name]), 0, "No announcements to this backend"
+    )
+    rx = next(filter(lambda x: x["title"] == release.title, rx_lists[backend.name]))
+    rx_lists[backend.name].remove(rx)
+    _check_rx(test_suite, backend, rx, release)
+
+
+def _check_rx(test_suite, backend, rx, release):
     local_indexer = None
     if "lidarr" not in backend.name.lower():
         local_indexer = "Irc" + release.indexer
@@ -75,15 +88,25 @@ def send_approved(name, approved):
     tx_lists[name].append({"approved": approved})
 
 
+def send_approved_title(name, release, approved):
+    tx_dicts[name][release.title] = {"approved": approved}
+
+
 def clear_all_backends():
     for b in rx_lists.keys():
         rx_lists[b] = []
     for b in tx_lists.keys():
         tx_lists[b] = []
+    for b in tx_dicts.keys():
+        tx_dicts[b] = {}
 
 
 def get_tx_list(backend_name):
     return tx_lists[backend_name]
+
+
+def get_tx_dict(backend_name):
+    return tx_dicts[backend_name]
 
 
 def get_rx_list(backend_name):
@@ -98,27 +121,43 @@ def _run_backend(backend):
     def push():
         rx_list = get_rx_list(backend.name)
         tx_list = get_tx_list(backend.name)
+        tx_dict = get_tx_dict(backend.name)
 
         rx_list.append(request.json)
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
-        if len(tx_list) == 0:
-            return jsonify({"approved": False})
+        if len(tx_list) != 0:
+            app = tx_list.pop(0)
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
+        elif request.json["title"] in tx_dict:
+            app = tx_dict.pop(request.json["title"])
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
         else:
-            return jsonify(tx_list.pop(0))
+            # print(backend.name, "got", rx_list[-1]["title"], ": False")
+            return jsonify({"approved": False})
 
     @app.route("/api/v1/release/push", methods=["POST"])
     def push_v1():
         rx_list = get_rx_list(backend.name)
         tx_list = get_tx_list(backend.name)
+        tx_dict = get_tx_dict(backend.name)
 
         rx_list.append(request.json)
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
-        if len(tx_list) == 0:
-            return jsonify({"approved": False})
+        if len(tx_list) != 0:
+            app = tx_list.pop(0)
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
+        elif request.json["title"] in tx_dict:
+            app = tx_dict.pop(request.json["title"])
+            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
+            return jsonify(app)
         else:
-            return jsonify(tx_list.pop(0))
+            # print(backend.name, "got", rx_list[-1]["title"], ": False")
+            return jsonify({"approved": False})
 
     @app.route("/shutdown")
     def shutdown():
@@ -139,6 +178,7 @@ def stop():
     global _backends
     global rx_lists
     global tx_lists
+    global tx_dicts
     for b in _backends.keys():
         if _backends[b].thread is not None:
             if not _call_shutdown(_backends[b].port):
@@ -149,10 +189,14 @@ def stop():
     _backends = {}
     rx_lists = {}
     tx_lists = {}
+    tx_dicts = {}
 
 
 def _create_thread(backend):
-    backend.thread = threading.Thread(target=_run_backend, args=(backend,),)
+    backend.thread = threading.Thread(
+        target=_run_backend,
+        args=(backend,),
+    )
     backend.thread.start()
 
 
@@ -161,5 +205,6 @@ def run(config):
     for backend in config.backends.values():
         rx_lists[backend.name] = []
         tx_lists[backend.name] = []
+        tx_dicts[backend.name] = {}
         _create_thread(backend)
     _backends = config.backends

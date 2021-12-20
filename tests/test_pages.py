@@ -22,7 +22,7 @@ config = misc.Config(
 )
 
 
-class DelayTest(unittest.TestCase):
+class PagesTest(unittest.TestCase):
     @classmethod
     def setUpClass(self):
         misc.setUpClass(config)
@@ -57,14 +57,20 @@ class DelayTest(unittest.TestCase):
             releases.append(release)
 
         for release in releases:
-            backends.check_rx(
-                self, config.backends["MySonarr"], release,
+            backends.find_and_check_rx(
+                self,
+                config.backends["MySonarr"],
+                release,
             )
-            backends.check_rx(
-                self, config.backends["MyRadarr"], release,
+            backends.find_and_check_rx(
+                self,
+                config.backends["MyRadarr"],
+                release,
             )
-            backends.check_rx(
-                self, config.backends["MyLidarr"], release,
+            backends.find_and_check_rx(
+                self,
+                config.backends["MyLidarr"],
+                release,
             )
 
         misc.check_announcements(self, config, releases, [])
@@ -85,15 +91,15 @@ class DelayTest(unittest.TestCase):
             )
 
             if i % 3 == 0:
-                backends.send_approved("MySonarr", True)
+                backends.send_approved_title("MySonarr", release, True)
                 release.snatches.append("MySonarr")
                 snatches.append(release)
             elif i % 5 == 0:
-                backends.send_approved("MyRadarr", True)
+                backends.send_approved_title("MyRadarr", release, True)
                 release.snatches.append("MyRadarr")
                 snatches.append(release)
             elif i % 7 == 0:
-                backends.send_approved("MyLidarr", True)
+                backends.send_approved_title("MyLidarr", release, True)
                 release.snatches.append("MyLidarr")
                 snatches.append(release)
             irc.announce(release, wait=0.3)

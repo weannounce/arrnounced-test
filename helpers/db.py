@@ -51,7 +51,7 @@ def check_announced(test_suite, release):
 
 @db_session
 def check_announcements(test_suite, releases):
-    announcements = _get_announced(len(releases))
+    announcements = _get_announced()
     test_suite.assertEqual(
         len(announcements), len(releases), "No announcement in database"
     )
