@@ -121,8 +121,7 @@ def get_rx_list(backend_name):
 def _run_backend(backend):
     app = Flask(backend.name)
 
-    @app.route("/api/release/push", methods=["POST"])
-    def push():
+    def _push():
         rx_list = get_rx_list(backend.name)
         tx_list = get_tx_list(backend.name)
         tx_dict = get_tx_dict(backend.name)
@@ -141,27 +140,14 @@ def _run_backend(backend):
         else:
             # print(backend.name, "got", rx_list[-1]["title"], ": False")
             return jsonify({"approved": False})
+
+    @app.route("/api/release/push", methods=["POST"])
+    def push():
+        return _push()
 
     @app.route("/api/v1/release/push", methods=["POST"])
     def push_v1():
-        rx_list = get_rx_list(backend.name)
-        tx_list = get_tx_list(backend.name)
-        tx_dict = get_tx_dict(backend.name)
-
-        rx_list.append(request.json)
-        rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
-
-        if len(tx_list) != 0:
-            app = tx_list.pop(0)
-            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
-            return jsonify(app)
-        elif request.json["title"] in tx_dict:
-            app = tx_dict.pop(request.json["title"])
-            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
-            return jsonify(app)
-        else:
-            # print(backend.name, "got", rx_list[-1]["title"], ": False")
-            return jsonify({"approved": False})
+        return _push()
 
     @app.route("/shutdown")
     def shutdown():
