@@ -149,6 +149,10 @@ def _run_backend(backend):
     def push_v1():
         return _push()
 
+    @app.route("/api/v3/release/push", methods=["POST"])
+    def push_v3():
+        return _push()
+
     @app.route("/shutdown")
     def shutdown():
         func = request.environ.get("werkzeug.server.shutdown")
