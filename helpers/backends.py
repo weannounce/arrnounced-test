@@ -118,7 +118,7 @@ def get_rx_list(backend_name):
 
 
 # TODO: Check API key
-def _run_backend(backend):
+def _run_backend(backend):  # noqa: C901
     app = Flask(backend.name)
 
     def _push():
@@ -152,6 +152,18 @@ def _run_backend(backend):
     @app.route("/api/v3/release/push", methods=["POST"])
     def push_v3():
         return _push()
+
+    @app.route("/api/diskspace", methods=["GET"])
+    def diskspace():
+        return jsonify({})
+
+    @app.route("/api/v1/diskspace", methods=["GET"])
+    def diskspace_v1():
+        return jsonify({})
+
+    @app.route("/api/v3/diskspace", methods=["GET"])
+    def diskspace_v3():
+        return jsonify({})
 
     @app.route("/shutdown")
     def shutdown():

@@ -70,8 +70,8 @@ def setUpClass(config, start_browser=True):
     global irc_thread
     irc_thread = Thread(target=irc.run, args=[config])
     irc_thread.start()
-    arrnounced.run(config)
     backends.run(config)
+    arrnounced.run(config)
     db.init()
     irc.ready_event.wait()
 
