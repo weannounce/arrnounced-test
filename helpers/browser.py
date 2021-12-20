@@ -1,3 +1,4 @@
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.keys import Keys
@@ -9,13 +10,11 @@ browser = None
 def renotify(test_suite, config, table_row, backend, success):
     _get_main(config)
     action_div = browser.find_element_by_xpath(
-        "//*[@id='announced_torrents']/table/tbody/tr[{}]/td[5]/div".format(table_row)
+        f"//*[@id='announced_torrents']/table/tbody/tr[{table_row}]/td[5]/div"
     )
     dropdown = action_div.find_element_by_xpath("a[@href='#']")
     dropdown.click()
-    renotify_link = action_div.find_element_by_xpath(
-        "ul/li/a[text()='{}']".format(backend)
-    )
+    renotify_link = action_div.find_element_by_xpath(f"ul/li/a[text()='{backend}']")
     renotify_link.click()
 
     time.sleep(0.5)
@@ -35,7 +34,9 @@ def _check_toastr(test_suite, backend, success):
     )
 
     test_suite.assertEqual(
-        toastr.text, backend + toastr_text, "Toastr text not ok",
+        toastr.text,
+        backend + toastr_text,
+        "Toastr text not ok",
     )
 
     time.sleep(7)
@@ -62,9 +63,12 @@ def _get_next_row(rows, pager_id, table_id):
     if rows is None:
         rows = []
     elif len(rows) == 0:
-        browser.find_element_by_xpath(
-            "//*[@id='{}']/li/a[text()='Next']".format(pager_id)
-        ).click()
+        try:
+            browser.find_element_by_xpath(
+                f"//*[@id='{pager_id}']/li[@class='page-item next']/a[text()='Next']"
+            ).click()
+        except NoSuchElementException:
+            return None, []
 
     if len(rows) == 0:
         rows = (
@@ -73,9 +77,56 @@ def _get_next_row(rows, pager_id, table_id):
             .find_elements_by_tag_name("tr")
         )
 
-    row = rows.pop(0)
+    row = rows.pop(0) if rows else None
 
     return (row, rows)
+
+
+def _check_announcement_cells(test_suite, cells, release):
+    test_suite.assertEqual(len(cells), 5)
+    test_suite.assertEqual(cells[2].text, release.title)
+    test_suite.assertEqual(cells[1].text, release.indexer)
+
+    web_backends = cells[3].text.split("/")
+    test_suite.assertEqual(
+        len(web_backends), len(release.backends), "Backends length does not match"
+    )
+    for backend in web_backends:
+        test_suite.assertTrue(backend in release.backends)
+
+    torrent_url = cells[4].find_element_by_id("torrent_url").get_attribute("href")
+    test_suite.assertEqual(
+        torrent_url, release.url, "Browser torrent URL did not match"
+    )
+
+
+def check_unordered_announcements(test_suite, config, releases):
+    # This function does not handle releases with the same title
+    row_count = 0
+    release_count = len(releases)
+
+    releases_copy = releases.copy()
+    releases_copy.reverse()
+
+    _get_main(config)
+    rows = None
+    row, rows = _get_announce_row(rows)
+
+    while row:
+        cells = row.find_elements_by_tag_name("td")
+        release = next(filter(lambda x: x.title == cells[2].text, releases_copy), None)
+        test_suite.assertNotEqual(
+            release, None, f"Row title '{cells[2].text}' was not found among releases"
+        )
+        releases_copy.remove(release)
+        _check_announcement_cells(test_suite, cells, release)
+
+        row_count += 1
+        row, rows = _get_announce_row(rows)
+
+    test_suite.assertEqual(
+        row_count, release_count, "Found table rows is not equal to releases"
+    )
 
 
 def check_announcements(test_suite, config, releases):
@@ -86,21 +137,43 @@ def check_announcements(test_suite, config, releases):
         (row, rows) = _get_announce_row(rows)
         test_suite.assertNotEqual(row, None, "Not enough releases in table")
         cells = row.find_elements_by_tag_name("td")
-        test_suite.assertEqual(len(cells), 5)
-        test_suite.assertEqual(cells[1].text, release.indexer)
-        test_suite.assertEqual(cells[2].text, release.title)
+        _check_announcement_cells(test_suite, cells, release)
 
-        web_backends = cells[3].text.split("/")
-        test_suite.assertEqual(
-            len(web_backends), len(release.backends), "Backends length does not match"
-        )
-        for backend in web_backends:
-            test_suite.assertTrue(backend in release.backends)
 
-        torrent_url = cells[4].find_element_by_id("torrent_url").get_attribute("href")
-        test_suite.assertEqual(
-            torrent_url, release.url, "Browser torrent URL did not match"
+def _check_snatch_cells(test_suite, cells, release):
+    test_suite.assertEqual(len(cells), 4)
+    test_suite.assertEqual(cells[2].text, release.title)
+    test_suite.assertEqual(cells[1].text, release.indexer)
+    test_suite.assertEqual(cells[3].text, release.snatches[-1])
+
+
+def check_unordered_snatches(test_suite, releases):
+    # This function does not handle releases snatched several times
+    row_count = 0
+    release_count = len(releases)
+
+    releases_copy = releases.copy()
+    releases_copy.reverse()
+
+    rows = None
+    row, rows = _get_snatch_row(rows)
+
+    while row:
+        cells = row.find_elements_by_tag_name("td")
+        release = next(filter(lambda x: x.title == cells[2].text, releases_copy), None)
+        test_suite.assertNotEqual(
+            release, None, f"Row title '{cells[2].text}' was not found among releases"
         )
+        releases_copy.remove(release)
+
+        _check_snatch_cells(test_suite, cells, release)
+
+        row_count += 1
+        row, rows = _get_snatch_row(rows)
+
+    test_suite.assertEqual(
+        row_count, release_count, "Found table rows is not equal to releases"
+    )
 
 
 def check_snatches(test_suite, releases):
@@ -108,13 +181,11 @@ def check_snatches(test_suite, releases):
     for release in reversed(releases):
         if len(release.snatches) == 0:
             continue
-        (row, rows) = _get_snatch_row(rows)
+        row, rows = _get_snatch_row(rows)
+        test_suite.assertNotEqual(row, None)
 
         cells = row.find_elements_by_tag_name("td")
-        test_suite.assertEqual(len(cells), 4)
-        test_suite.assertEqual(cells[1].text, release.indexer)
-        test_suite.assertEqual(cells[2].text, release.title)
-        test_suite.assertEqual(cells[3].text, release.snatches[-1])
+        _check_snatch_cells(test_suite, cells, release)
 
 
 def _get_main(config):

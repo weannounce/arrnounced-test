@@ -49,7 +49,11 @@ def find_and_check_rx(test_suite, backend, release):
     test_suite.assertNotEqual(
         len(rx_lists[backend.name]), 0, "No announcements to this backend"
     )
-    rx = next(filter(lambda x: x["title"] == release.title, rx_lists[backend.name]))
+    rx = next(
+        filter(lambda x: x["title"] == release.title, rx_lists[backend.name]), None
+    )
+    test_suite.assertNotEqual(rx, None, "Backend did not receive release")
+
     rx_lists[backend.name].remove(rx)
     _check_rx(test_suite, backend, rx, release)
 
@@ -171,7 +175,7 @@ def _run_backend(backend):
 
 
 def _call_shutdown(port):
-    return requests.get("http://localhost:{}/shutdown".format(port)).status_code == 200
+    return requests.get(f"http://localhost:{port}/shutdown").status_code == 200
 
 
 def stop():

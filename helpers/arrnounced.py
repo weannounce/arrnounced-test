@@ -1,6 +1,7 @@
 import requests
 import subprocess
 import os
+import shutil
 from helpers import config as global_config
 
 container_name = "arrnounced_test"
@@ -14,10 +15,7 @@ def stop(config):
     global arr_process
     print("Stopping Arrnounced")
 
-    if (
-        requests.get("http://localhost:{}/shutdown".format(config.web_port)).status_code
-        != 200
-    ):
+    if requests.get(f"http://localhost:{config.web_port}/shutdown").status_code != 200:
         print("Failed to shutdown Arrnounced. Killing instead!")
         if global_config.docker is None:
             arr_process.kill()
@@ -38,8 +36,8 @@ def run(config):
                 "run",
                 "-p",
                 "--source",
-                "../arrnounced/src",
-                "../arrnounced/src/arrnounced.py",
+                "../arrnounced/arrnounced",
+                str(shutil.which("arrnounced")),
                 "-v",
                 "-c",
                 "configs/" + config.config_file,
