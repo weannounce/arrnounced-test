@@ -69,6 +69,12 @@ allowed_errors = [
         r"File ..* line",
         r"pony.orm.core.UnexpectedError: Object Announced.new:1. cannot be stored in the database. OperationalError: no such table: Announced",
     ],
+    [
+        r"Could not access backend 'http://localhost:7880/api/v3/diskspace': Cannot connect to host localhost:7880",
+    ],
+    [
+        r"Could not access backend 'http://localhost:7880/api/diskspace': Cannot connect to host localhost:7880",
+    ],
     # TODO: Replace werkzeug
     [r"WARNING:werkzeug\s+-\s+\* Running on all addresses"],
     [
