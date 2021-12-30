@@ -47,7 +47,7 @@ class DelayTest(unittest.TestCase):
         )
 
         irc.announce(release)
-        time.sleep(6)
+        time.sleep(7)
 
         backends.max_announcements(self, "delayed_sonarr", 0)
         backends.max_announcements(self, "delayed_radarr", 0)

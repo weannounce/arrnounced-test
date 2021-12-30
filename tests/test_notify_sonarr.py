@@ -1,5 +1,5 @@
 import unittest
-from helpers import db, irc, backends, web, browser, misc
+from helpers import db, backends, web, browser, misc
 from helpers.misc import Release
 import selenium
 
@@ -17,11 +17,11 @@ config = misc.Config(
 
 class SingleTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         misc.setUpClass(config)
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         misc.tearDownClass(config)
 
     @db.db_session
@@ -42,7 +42,8 @@ class SingleTest(unittest.TestCase):
             backends=["my_sonarr"],
         )
 
-        irc.announce(release)
+        backends.push_counter = 1
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -73,7 +74,7 @@ class SingleTest(unittest.TestCase):
 
         backends.send_approved("my_sonarr", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -104,7 +105,7 @@ class SingleTest(unittest.TestCase):
 
         backends.send_approved("my_sonarr", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -164,7 +165,7 @@ class SingleTest(unittest.TestCase):
             backends=["my_sonarr"],
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,

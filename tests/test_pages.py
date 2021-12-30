@@ -1,5 +1,6 @@
 import unittest
-from helpers import db, irc, backends, web, misc
+import time
+from helpers import db, backends, web, misc
 from helpers.misc import Release
 
 trackers = [
@@ -53,8 +54,11 @@ class PagesTest(unittest.TestCase):
                 backends=config.backends.keys(),
             )
 
-            irc.announce(release, wait=0.1)
+            misc.announce_await_push(self, release, wait=0)
             releases.append(release)
+
+        # Wait for all to complete
+        time.sleep(1)
 
         for release in releases:
             backends.find_and_check_rx(
@@ -102,8 +106,11 @@ class PagesTest(unittest.TestCase):
                 backends.send_approved_title("MyLidarr", release, True)
                 release.snatches.append("MyLidarr")
                 snatches.append(release)
-            irc.announce(release, wait=0.1)
+            misc.announce_await_push(self, release, wait=0)
             releases.append(release)
+
+        # Wait for all to complete
+        time.sleep(1)
 
         backends.max_announcements(self, "MySonarr", 90)
         backends.max_announcements(self, "MyRadarr", 90)

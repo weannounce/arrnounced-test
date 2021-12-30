@@ -117,11 +117,24 @@ def get_rx_list(backend_name):
     return rx_lists[backend_name]
 
 
+push_done = threading.Event()
+push_counter = 0
+
+
+def _approved(something):
+    return (
+        isinstance(something, dict)
+        and "approved" in something
+        and something["approved"] is True
+    )
+
+
 # TODO: Check API key
 def _run_backend(backend):  # noqa: C901
     app = Flask(backend.name)
 
     def _push():
+        global push_counter
         rx_list = get_rx_list(backend.name)
         tx_list = get_tx_list(backend.name)
         tx_dict = get_tx_dict(backend.name)
@@ -130,16 +143,20 @@ def _run_backend(backend):  # noqa: C901
         rx_list[-1]["apikey"] = request.headers["X-Api-Key"]
 
         if len(tx_list) != 0:
-            app = tx_list.pop(0)
-            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
-            return jsonify(app)
+            ret = tx_list.pop(0)
         elif request.json["title"] in tx_dict:
-            app = tx_dict.pop(request.json["title"])
-            # print(backend.name, "got", rx_list[-1]["title"], ":", app)
-            return jsonify(app)
+            ret = tx_dict.pop(request.json["title"])
         else:
-            # print(backend.name, "got", rx_list[-1]["title"], ": False")
-            return jsonify({"approved": False})
+            ret = {"approved": False}
+
+        print(backend.name, "got", rx_list[-1]["title"], ":", ret)
+        push_counter -= 1
+        # Notify test thread that push is completed if the release is approved
+        # or pushed to all backends.
+        if _approved(ret) or push_counter <= 0:
+            push_counter = len(_backends)
+            push_done.set()
+        return jsonify(ret)
 
     @app.route("/api/release/push", methods=["POST"])
     def push():
@@ -185,6 +202,8 @@ def stop():
     global rx_lists
     global tx_lists
     global tx_dicts
+    global push_done
+    global push_counter
     for b in _backends.keys():
         if _backends[b].thread is not None:
             if not _call_shutdown(_backends[b].port):
@@ -196,6 +215,8 @@ def stop():
     rx_lists = {}
     tx_lists = {}
     tx_dicts = {}
+    push_done.clear()
+    push_counter = len(_backends)
 
 
 def _create_thread(backend):

@@ -49,21 +49,21 @@ class SingleTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        irc.announce(release, wait=0.5)
         backends.max_announcements(self, "my_sonarr", 0)
         backends.max_announcements(self, "my_radarr", 0)
         backends.max_announcements(self, "my_lidarr", 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
-        irc.announce(release)
+        irc.announce(release, wait=0.5)
         backends.max_announcements(self, "my_sonarr", 0)
         backends.max_announcements(self, "my_radarr", 0)
         backends.max_announcements(self, "my_lidarr", 0)
         self.assertEqual(db.nr_announcements(), 0)
         self.assertEqual(db.nr_snatches(), 0)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -109,7 +109,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
         irc.announce(release)
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -143,7 +143,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
         irc.announce(release)
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -202,7 +202,7 @@ class SingleTest(unittest.TestCase):
 
         irc.announce(release)
         irc.announce(release)
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,

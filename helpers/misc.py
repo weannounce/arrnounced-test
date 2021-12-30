@@ -1,3 +1,5 @@
+import time
+
 from helpers import db, irc, backends, browser, arrnounced
 from threading import Thread
 
@@ -42,6 +44,14 @@ class Release:
         self.backends = [] if backends is None else backends
         self.snatches = [] if snatches is None else snatches
         self.protocol = protocol
+
+
+def announce_await_push(test_suite, release, wait=0.1):
+    irc.announce(release)
+    if not backends.push_done.wait(timeout=5):
+        test_suite.assertTrue(False, "Backend pushes never completed")
+    backends.push_done.clear()
+    time.sleep(wait)
 
 
 def check_announced(test_suite, config, release):

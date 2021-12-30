@@ -1,5 +1,5 @@
 import unittest
-from helpers import db, irc, backends, web, misc
+from helpers import db, backends, web, misc
 from helpers.misc import Release
 
 channel = "#simple1"
@@ -48,7 +48,7 @@ class DelayTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         for backend in config.backends.values():
             backends.check_first_rx(
@@ -79,7 +79,7 @@ class DelayTest(unittest.TestCase):
 
         backends.send_approved("Radarr1", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -114,7 +114,7 @@ class DelayTest(unittest.TestCase):
 
         backends.send_approved("Radarr2", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -149,7 +149,7 @@ class DelayTest(unittest.TestCase):
 
         backends.send_approved("Sonarr1", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -184,7 +184,7 @@ class DelayTest(unittest.TestCase):
 
         backends.send_approved("Sonarr2", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -219,7 +219,7 @@ class DelayTest(unittest.TestCase):
 
         backends.send_approved("Lidarr1", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -254,7 +254,7 @@ class DelayTest(unittest.TestCase):
 
         backends.send_approved("Lidarr2", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,

@@ -22,7 +22,7 @@ def notify_if_ready():
         ready_event.set()
 
 
-def announce(release, wait=0.5):
+def announce(release, wait=0):
     global client
     global event_loop
     asyncio.run_coroutine_threadsafe(

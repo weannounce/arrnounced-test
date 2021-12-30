@@ -45,7 +45,7 @@ class LineMatchedTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.max_announcements(self, "line_sonarr", 1)
         backends.max_announcements(self, "line_radarr", 1)
@@ -54,7 +54,9 @@ class LineMatchedTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_extracttags_empty_tag(self):
@@ -67,7 +69,7 @@ class LineMatchedTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.max_announcements(self, "line_sonarr", 1)
         backends.max_announcements(self, "line_radarr", 1)
@@ -76,15 +78,18 @@ class LineMatchedTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
         misc.check_announced(
-            self, config, release,
+            self,
+            config,
+            release,
         )
 
     def test_missing_torrent_url(self):
         release = Release(
-            messages=["tags: tag1||tag2 - extractone: SetRegex : ; 2"], channel=channel,
+            messages=["tags: tag1||tag2 - extractone: SetRegex : ; 2"],
+            channel=channel,
         )
 
-        irc.announce(release)
+        irc.announce(release, wait=1)
 
         backends.max_announcements(self, "line_sonarr", 0)
         backends.max_announcements(self, "line_radarr", 0)
@@ -93,9 +98,12 @@ class LineMatchedTest(unittest.TestCase):
         self.assertEqual(db.nr_snatches(), 0)
 
     def test_all_variables_missing(self):
-        release = Release(messages=["test - test"], channel=channel,)
+        release = Release(
+            messages=["test - test"],
+            channel=channel,
+        )
 
-        irc.announce(release)
+        irc.announce(release, wait=1)
 
         backends.max_announcements(self, "line_sonarr", 0)
         backends.max_announcements(self, "line_radarr", 0)

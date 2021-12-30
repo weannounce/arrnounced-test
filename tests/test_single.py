@@ -43,7 +43,7 @@ class SingleTest(unittest.TestCase):
             channel=channel,
         )
 
-        irc.announce(release)
+        irc.announce(release, wait=1)
 
         backends.max_announcements(self, "my_sonarr", 0)
         backends.max_announcements(self, "my_radarr", 0)
@@ -61,7 +61,7 @@ class SingleTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -101,7 +101,7 @@ class SingleTest(unittest.TestCase):
 
         backends.send_approved("my_sonarr", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -133,7 +133,7 @@ class SingleTest(unittest.TestCase):
 
         backends.send_approved("my_radarr", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -165,7 +165,7 @@ class SingleTest(unittest.TestCase):
 
         backends.send_approved("my_lidarr", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -197,7 +197,7 @@ class SingleTest(unittest.TestCase):
 
         backends.send_approved("my_sonarr", True)
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -249,7 +249,7 @@ class SingleTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.max_announcements(self, "my_sonarr", 1)
         backends.max_announcements(self, "my_radarr", 1)
@@ -282,7 +282,7 @@ class SingleTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -319,7 +319,7 @@ class SingleTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -356,7 +356,7 @@ class SingleTest(unittest.TestCase):
             backends=config.backends.keys(),
         )
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         backends.check_first_rx(
             self,
@@ -397,7 +397,7 @@ class SingleTest(unittest.TestCase):
         backends.send("my_radarr", "broken")
         backends.send("my_lidarr", "{'approved': 'asdf'}")
 
-        irc.announce(release)
+        misc.announce_await_push(self, release)
 
         self.assertEqual(db.nr_announcements(), 1)
         self.assertEqual(db.nr_snatches(), 0)
