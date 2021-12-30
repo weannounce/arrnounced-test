@@ -75,6 +75,14 @@ allowed_errors = [
     [
         r"Could not access backend 'http://localhost:7880/api/diskspace': Cannot connect to host localhost:7880",
     ],
+    # These logs are seen when arrnounced is shutdown while the IRC clients are
+    # connecting. It happens sometimes in test_database_age when restarting
+    # arrnounced
+    [
+        r"ERROR:pydle.client\s+-\s+Failed to execute on_raw_372 handler.",
+        r"Traceback \(most recent call last\):",
+        r"TypeError: unsupported operand type\(s\) for \+=: 'NoneType' and 'str'",
+    ],
     # TODO: Replace werkzeug
     [r"WARNING:werkzeug\s+-\s+\* Running on all addresses"],
     [
