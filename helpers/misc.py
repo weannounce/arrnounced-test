@@ -34,6 +34,7 @@ class Release:
         indexer=None,
         backends=None,
         snatches=None,
+        announce_time=None,
         protocol="Torrent",
     ):
         self.messages = messages
@@ -43,6 +44,7 @@ class Release:
         self.indexer = indexer
         self.backends = [] if backends is None else backends
         self.snatches = [] if snatches is None else snatches
+        self.announce_time = announce_time
         self.protocol = protocol
 
 
