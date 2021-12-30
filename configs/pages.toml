@@ -1,6 +1,9 @@
 [webui]
 shutdown = true
 
+[database]
+purge_days = 50
+
 [log]
 to_file = true
 to_console = false
