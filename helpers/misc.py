@@ -63,7 +63,7 @@ def check_announced(test_suite, config, release):
     browser.check_announced(test_suite, config, release)
 
 
-def check_announcements(test_suite, config, releases, snatches):
+def check_unordered_announcements(test_suite, config, releases, snatches):
     db.check_unordered_announcements(
         test_suite,
         releases,
@@ -71,6 +71,16 @@ def check_announcements(test_suite, config, releases, snatches):
 
     browser.check_unordered_announcements(test_suite, config, releases)
     browser.check_unordered_snatches(test_suite, snatches)
+
+
+def check_announcements(test_suite, config, releases, snatches):
+    db.check_announcements(
+        test_suite,
+        releases,
+    )
+
+    browser.check_announcements(test_suite, config, releases)
+    browser.check_snatches(test_suite, snatches)
 
 
 irc_thread = None

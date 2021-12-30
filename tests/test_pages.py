@@ -95,15 +95,15 @@ class PagesTest(unittest.TestCase):
             )
 
             if i % 3 == 0:
-                backends.send_approved_title("MySonarr", release, True)
+                backends.send_approved("MySonarr", True)
                 release.snatches.append("MySonarr")
                 snatches.append(release)
             elif i % 5 == 0:
-                backends.send_approved_title("MyRadarr", release, True)
+                backends.send_approved("MyRadarr", True)
                 release.snatches.append("MyRadarr")
                 snatches.append(release)
             elif i % 7 == 0:
-                backends.send_approved_title("MyLidarr", release, True)
+                backends.send_approved("MyLidarr", True)
                 release.snatches.append("MyLidarr")
                 snatches.append(release)
             misc.announce_await_push(self, release, wait=0)
