@@ -41,6 +41,20 @@ def clear_db():
     Snatched.select().delete()
 
 
+@db_session
+def insert_announcement(release, snatched):
+    a = Announced(
+        date=release.announce_time,
+        title=release.title,
+        torrent=release.url,
+        indexer=release.indexer,
+        backend="/".join(release.backends),
+    )
+
+    if snatched:
+        Snatched(date=release.announce_time, announced=a, backend=release.snatches[0])
+
+
 def get_time_diff(release, db_time):
     return abs((release.announce_time - db_time).total_seconds())
 
