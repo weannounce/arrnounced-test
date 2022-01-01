@@ -17,7 +17,6 @@ def renotify(test_suite, config, table_row, backend, success):
     renotify_link = action_div.find_element_by_xpath(f"ul/li/a[text()='{backend}']")
     renotify_link.click()
 
-    time.sleep(0.5)
     _check_toastr(test_suite, backend, success)
 
 
@@ -29,10 +28,18 @@ def _check_toastr(test_suite, backend, success):
         class_name = "toast-error"
         toastr_text = " still declined this torrent..."
 
-    toastr = browser.find_element_by_id("toast-container").find_element_by_class_name(
-        class_name
-    )
+    toastr = None
+    for i in range(4):
+        time.sleep(0.5)
+        try:
+            toastr = browser.find_element_by_id(
+                "toast-container"
+            ).find_element_by_class_name(class_name)
+            break
+        except NoSuchElementException:
+            pass
 
+    test_suite.assertNotEqual(toastr, None)
     test_suite.assertEqual(
         toastr.text,
         backend + toastr_text,
