@@ -50,8 +50,9 @@ class Release:
 
 def announce_await_push(test_suite, release, wait=0.1):
     irc.announce(release)
-    if not backends.push_done.wait(timeout=5):
-        test_suite.assertTrue(False, "Backend pushes never completed")
+    test_suite.assertTrue(
+        backends.push_done.wait(timeout=5), "Backend pushes never completed"
+    )
     backends.push_done.clear()
     time.sleep(wait)
 
