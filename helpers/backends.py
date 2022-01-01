@@ -203,7 +203,6 @@ def stop():
     global tx_lists
     global tx_dicts
     global push_done
-    global push_counter
     for b in _backends.keys():
         if _backends[b].thread is not None:
             if not _call_shutdown(_backends[b].port):
@@ -216,7 +215,6 @@ def stop():
     tx_lists = {}
     tx_dicts = {}
     push_done.clear()
-    push_counter = len(_backends)
 
 
 def _create_thread(backend):
@@ -229,9 +227,11 @@ def _create_thread(backend):
 
 def run(config):
     global _backends
+    global push_counter
     for backend in config.backends.values():
         rx_lists[backend.name] = []
         tx_lists[backend.name] = []
         tx_dicts[backend.name] = {}
         _create_thread(backend)
     _backends = config.backends
+    push_counter = len(_backends)
