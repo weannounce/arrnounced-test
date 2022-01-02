@@ -96,7 +96,8 @@ def setUpClass(config, start_browser=True):
     backends.run(config)
     arrnounced.run(config)
     db.init()
-    irc.ready_event.wait()
+    if not irc.ready_event.wait(timeout=30):
+        print("IRC not ready in time")
 
     # Browser performs login, wait for everything to start before.
     if start_browser:
