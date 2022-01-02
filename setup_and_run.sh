@@ -53,7 +53,7 @@ start_date=$(date)
 for i in $(seq "$RUNS")
 do
   echo "Run number $i in progress"
-  run_tests "$@" || break
+  run_tests "$@" || { RET=1; break; }
 done
 
 echo "Start $start_date"
