@@ -62,7 +62,7 @@ class TransactionErrorTest(unittest.TestCase):
 
     def test_database_age(self):
         old_release = Release(
-            messages=["database transaction title : some stuff"],
+            messages=[],
             channel=channel,
             title="too old",
             url="smth: some stuff",
@@ -74,7 +74,7 @@ class TransactionErrorTest(unittest.TestCase):
         db.insert_announcement(old_release, snatched=True)
 
         young_release = Release(
-            messages=["database transaction title : some stuff"],
+            messages=[],
             channel=channel,
             title="young",
             url="smth: some stuff",
