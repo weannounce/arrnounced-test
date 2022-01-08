@@ -9,10 +9,13 @@ function get_logs()
 
 RUNS=1
 
-while getopts ":n:" o; do
+while getopts ":d:n:" o; do
     case "${o}" in
         n)
             RUNS=${OPTARG}
+            ;;
+        d)
+            DOCKER_FLAG=("--docker" "${OPTARG}")
             ;;
         *)
             echo "Unknown flag"
@@ -34,7 +37,7 @@ run_tests()
   rm -vrf data/*.log*
 
   #py-spy record --idle -o profile.svg -- ./run_tests.py "$@" || RET=1
-  ./run_tests.py "$@" || return 1
+  ./run_tests.py "${DOCKER_FLAG[@]}" "$@" || return 1
   coverage combine
   coverage html
 
