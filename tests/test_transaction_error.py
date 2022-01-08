@@ -2,7 +2,6 @@ import unittest
 from datetime import datetime, timedelta
 from helpers import arrnounced, db, irc, backends, web, misc
 from helpers.misc import Release
-import time
 import os
 
 channel = "#simple1"
@@ -92,8 +91,10 @@ class TransactionErrorTest(unittest.TestCase):
 
         # Restart arrnounced to trigger purge event, instead of waiting until
         # next purge loop
+        irc.ready_event.clear()
+        irc.expected_users = config.irc_users
         arrnounced.stop(config)
         arrnounced.run(config)
-        time.sleep(2)
+        self.assertTrue(irc.ready_event.wait(timeout=30), "IRC not ready in time")
 
         misc.check_announced(self, config, young_release)
