@@ -49,7 +49,7 @@ class TransactionErrorTest(unittest.TestCase):
 
         # Trigger database error by moving the db file
         os.rename("data/brain.db", "data/brain.db.tmp")
-        irc.announce(release)
+        irc.announce(release, wait=1)
         os.rename("data/brain.db.tmp", "data/brain.db")
 
         backends.max_announcements(self, "MySonarr", 0)
