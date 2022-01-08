@@ -52,14 +52,6 @@ allowed_errors = [
     [r"WARNING:WEB-HANDLER *- Could not find the requested backend 'nonexistent'"],
     [r"WARNING:IRC:.+ - Unknown command: "],
     [
-        r"ERROR:MESSAGE_HANDLER +- Database transaction failed for database transaction title",
-        r"Traceback .most recent call last.",
-        r"try: raise exc.with_traceback.tb.",
-        r"throw.UnexpectedError, 'Object %r cannot be stored in the database. %s: %s'",
-        r"File ..* line",
-        r"pony.orm.core.UnexpectedError: Object Announced.new:1. cannot be stored in the database. OperationalError: no such table: Announced",
-    ],
-    [
         r"Could not access backend 'http://localhost:7880/api/v3/diskspace': Cannot connect to host localhost:7880",
     ],
     [
@@ -81,32 +73,51 @@ allowed_errors = [
 ]
 
 if sys.version_info < (3, 8):
-    allowed_errors.append(
+    allowed_errors.extend(
         [
-            r"ERROR:SESSION\s+-\s+OS error when pushing release to http://localhost:7880",
-            r"Traceback .most recent call last.:",
-            r"raise exceptions.0.",
-            r"raise OSError.err, f'Connect call failed {address}'.",
-            r"ConnectionRefusedError: .Errno 111. Connect call failed .'127.0.0.1', 7880.",
-            r"The above exception was the direct cause of the following exception:",
-            r"Traceback .most recent call last.:",
-            r"client_error=client_error",
-            r"raise client_error.req.connection_key, exc. from exc",
-            r"aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host localhost:7880 ssl:default .Connect call failed .'127.0.0.1', 7880..",
+            [
+                r"ERROR:SESSION\s+-\s+OS error when pushing release to http://localhost:7880",
+                r"Traceback .most recent call last.:",
+                r"raise exceptions.0.",
+                r"raise OSError.err, f'Connect call failed {address}'.",
+                r"ConnectionRefusedError: .Errno 111. Connect call failed .'127.0.0.1', 7880.",
+                r"The above exception was the direct cause of the following exception:",
+                r"Traceback .most recent call last.:",
+                r"client_error=client_error",
+                r"raise client_error.req.connection_key, exc. from exc",
+                r"aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host localhost:7880 ssl:default .Connect call failed .'127.0.0.1', 7880..",
+            ],
+            [
+                r"ERROR:MESSAGE_HANDLER +- Database transaction failed for database transaction title",
+                r"Traceback .most recent call last.",
+                r"try: raise exc.with_traceback.tb.",
+                r"File ..* line",
+                r"pony.orm.core.UnexpectedError: Object Announced.new:1. cannot be stored in the database. OperationalError: no such table: Announced",
+            ],
         ]
     )
 else:
-    allowed_errors.append(
+    allowed_errors.extend(
         [
-            r"ERROR:SESSION\s+-\s+OS error when pushing release to http://localhost:7880",
-            r"Traceback .most recent call last.:",
-            r"raise exceptions.0.",
-            r"raise OSError.err, f'Connect call failed {address}'.",
-            r"ConnectionRefusedError: .Errno 111. Connect call failed .'127.0.0.1', 7880.",
-            r"The above exception was the direct cause of the following exception:",
-            r"Traceback .most recent call last.:",
-            r"raise client_error.req.connection_key, exc. from exc",
-            r"aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host localhost:7880 ssl:default .Connect call failed .'127.0.0.1', 7880..",
+            [
+                r"ERROR:SESSION\s+-\s+OS error when pushing release to http://localhost:7880",
+                r"Traceback .most recent call last.:",
+                r"raise exceptions.0.",
+                r"raise OSError.err, f'Connect call failed {address}'.",
+                r"ConnectionRefusedError: .Errno 111. Connect call failed .'127.0.0.1', 7880.",
+                r"The above exception was the direct cause of the following exception:",
+                r"Traceback .most recent call last.:",
+                r"raise client_error.req.connection_key, exc. from exc",
+                r"aiohttp.client_exceptions.ClientConnectorError: Cannot connect to host localhost:7880 ssl:default .Connect call failed .'127.0.0.1', 7880..",
+            ],
+            [
+                r"ERROR:MESSAGE_HANDLER +- Database transaction failed for database transaction title",
+                r"Traceback .most recent call last.",
+                r"try: raise exc.with_traceback.tb.",
+                r"throw.UnexpectedError, 'Object %r cannot be stored in the database. %s: %s'",
+                r"File ..* line",
+                r"pony.orm.core.UnexpectedError: Object Announced.new:1. cannot be stored in the database. OperationalError: no such table: Announced",
+            ],
         ]
     )
 
