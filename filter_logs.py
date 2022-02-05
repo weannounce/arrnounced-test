@@ -70,6 +70,11 @@ allowed_errors = [
     [
         r"WARNING: This is a development server. Do not use it in a production deployment"
     ],
+    [
+        "WebSocket transport not available. Install eventlet or gevent and gevent-websocket for improved performance"
+    ],
+    # Old socketio sessions causes this
+    ["Invalid session [0-9a-f]+ "],
 ]
 
 if sys.version_info < (3, 8):

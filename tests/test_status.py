@@ -59,7 +59,7 @@ class StatusTest(unittest.TestCase):
     def tearDown(self):
         web.logout()
 
-    #def test_kill_client(self):
+    # def test_kill_client(self):
     #    ts = TrackerStatus("simple1", "Simple1 Announcement", ["#simple1"])
     #    print("KILL test")
     #    #browser.get_status(config)
@@ -75,7 +75,7 @@ class StatusTest(unittest.TestCase):
     #    #browser.check_tracker_status(self, ts)
     #    browser.print_tracker_status(self, ts)
 
-    #def test_kick_client(self):
+    # def test_kick_client(self):
     #    ts = TrackerStatus("simple3", "Simple3 Announcement", ["#simple3"])
     #    print("KICK test")
     #    #browser.get_status(config)
@@ -85,7 +85,7 @@ class StatusTest(unittest.TestCase):
     #    irc.join("bipbopstatus3", ts.channels[0])
     #    browser.print_tracker_status(self, ts)
 
-    #def test_part_client(self):
+    # def test_part_client(self):
     #    ts = TrackerStatus("simple2", "Simple2 Announcement", ["#simple2"])
     #    print("PART test")
     #    #browser.get_status(config)
@@ -95,7 +95,7 @@ class StatusTest(unittest.TestCase):
     #    irc.join("bipbopstatus2", ts.channels[0])
     #    browser.print_tracker_status(self, ts)
 
-    #def test_join_two(self):
+    # def test_join_two(self):
     #    ts = TrackerStatus("simple2", "Simple2 Announcement", ["#simple2"])
     #    print("JOIN 2 test")
     #    browser.print_tracker_status(self, ts)
@@ -109,12 +109,15 @@ class StatusTest(unittest.TestCase):
         irc.mode("o", ts.channels[0])
         print("BANNED test")
         irc.ban("bipbopstatus1", ts.channels[0], True)
+        time.sleep(5)
 
         browser.print_tracker_status(self, ts)
         irc.part("bipbopstatus1", ts.channels[0], "you may leave")
         browser.print_tracker_status(self, ts)
+        time.sleep(5)
         irc.invite("bipbopstatus1", ts.channels[0])
         browser.print_tracker_status(self, ts)
+        time.sleep(5)
         irc.ban("bipbopstatus1", ts.channels[0], False)
 
         irc.mode("o", ts.channels[0], False)
