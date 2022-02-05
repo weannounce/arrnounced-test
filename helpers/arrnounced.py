@@ -1,7 +1,7 @@
-import requests
-import subprocess
+from subprocess import Popen
 import os
 import shutil
+import signal
 from helpers import config as global_config
 
 container_name = "arrnounced_test"
@@ -15,25 +15,18 @@ def stop(config):
     global arr_process
     print("Stopping Arrnounced")
 
-    if (
-        requests.get(f"http://localhost:{config.web_port}/shutdown").status_code != 200
-        or global_config.docker is not None
-    ):
-        print("Failed to shutdown Arrnounced. Killing instead!")
-        if global_config.docker is None:
-            arr_process.kill()
-        else:
-            subprocess.Popen(["docker", "container", "stop", container_name]).wait()
-    else:
-        print("Waiting for shutdown...")
+    if global_config.docker is None:
+        arr_process.send_signal(signal.SIGINT)
         arr_process.wait()
+    else:
+        Popen(["docker", "container", "stop", container_name]).wait()
 
 
 def run(config):
     global arr_process
     if global_config.docker is None:
         print("Starting Arrnounced from source")
-        arr_process = subprocess.Popen(
+        arr_process = Popen(
             [
                 "coverage",
                 "run",
@@ -52,7 +45,7 @@ def run(config):
         )
     else:
         print("Starting Arrnounced docker container")
-        arr_process = subprocess.Popen(
+        arr_process = Popen(
             [
                 "docker",
                 "run",

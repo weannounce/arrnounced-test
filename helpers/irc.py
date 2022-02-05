@@ -38,7 +38,7 @@ def kick(user, channel, reason):
     asyncio.run_coroutine_threadsafe(
         client.rawmsg("SAKICK", channel, user, reason), event_loop
     )
-    time.sleep(2)
+    time.sleep(0.1)
 
 
 def part(user, channel, reason):
@@ -47,21 +47,27 @@ def part(user, channel, reason):
     asyncio.run_coroutine_threadsafe(
         client.rawmsg("SAPART", user, channel, reason), event_loop
     )
-    time.sleep(2)
+    time.sleep(0.1)
 
 
 def join(user, channel):
     global client
     global event_loop
     asyncio.run_coroutine_threadsafe(client.rawmsg("SAJOIN", user, channel), event_loop)
-    time.sleep(2)
+    time.sleep(0.1)
 
 
 def kill(user, reason):
     global client
     global event_loop
     asyncio.run_coroutine_threadsafe(client.rawmsg("KILL", user, reason), event_loop)
-    time.sleep(10)
+    time.sleep(0.1)
+
+
+def ban(user, channel, set_ban):
+    if not set_ban:
+        user = user + "!*@*"
+    mode("b", channel, set_ban, user)
 
 
 def mode(modes, channel, add=True, user=global_config.irc_nickname):
@@ -76,6 +82,15 @@ def mode(modes, channel, add=True, user=global_config.irc_nickname):
     )
     time.sleep(0.2)
 
+
+def invite(user, channel):
+    asyncio.run_coroutine_threadsafe(
+        client.rawmsg(
+            "INVITE", user, channel,
+        ),
+        event_loop,
+    )
+    time.sleep(0.2)
 
 class IRC(BotBase):
     def __init__(self, nickname, channel, event_loop):
