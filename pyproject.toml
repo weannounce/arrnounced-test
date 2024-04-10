@@ -1,10 +1,3 @@
-[tool.poetry]
-name = "arrnounced-test"
-version = "0.1.0"
-description = "Integration tests for Arrnounced"
-authors = ["WeAnnounce <weannounce@protonmail.com>"]
-license = "GPLv3"
-
 [tool.poetry.dependencies]
 python = ">=3.7, <3.10"
 arrnounced = { path = "../arrnounced", develop = true }
@@ -13,8 +6,34 @@ coverage = "^6.2"
 py-spy = "^0.3.11"
 requests = "^2.22.0"
 
-[tool.poetry.dev-dependencies]
-
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools ~= 69.2", "wheel", "build"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "arrnounced-test"
+version = "0.1.0"
+description = "Integration tests for Arrnounced"
+authors = [
+  {"name" = "WeAnnounce", "email" = "weannounce@protonmail.com"},
+]
+license = {"text" = "GPLv3"}
+
+requires-python = ">= 3.7, < 3.10"
+
+dependencies = [
+  # No relative paths allwed so relying on this symlink
+  # TODO: get rid of this kind of dependency
+  "arrnounced @ file:///arrnounced",
+  "black",
+  "coverage~=6.2",
+  "pre-commit",
+  "py-spy~=0.3.11",
+  "requests~=2.22.0",
+  "selenium~=3.141.0",
+]
+
+[tool.setuptools.packages.find]
+include = [
+  "helpers",
+]
