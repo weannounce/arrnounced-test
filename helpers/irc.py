@@ -12,7 +12,6 @@ ready_event = threading.Event()
 
 event_loop = None
 client = None
-BotBase = pydle.featurize(pydle.features.RFC1459Support, pydle.features.TLSSupport)
 
 
 def notify_if_ready():
@@ -86,13 +85,16 @@ def mode(modes, channel, add=True, user=global_config.irc_nickname):
 def invite(user, channel):
     asyncio.run_coroutine_threadsafe(
         client.rawmsg(
-            "INVITE", user, channel,
+            "INVITE",
+            user,
+            channel,
         ),
         event_loop,
     )
     time.sleep(0.2)
 
-class IRC(BotBase):
+
+class IRC(pydle.features.TLSSupport):
     def __init__(self, nickname, channel, event_loop):
         super().__init__(nickname, eventloop=event_loop)
         self.nickname = nickname

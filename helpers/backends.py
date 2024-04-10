@@ -3,6 +3,7 @@ import requests
 import sys
 import threading
 from datetime import datetime
+from werkzeug import serving
 
 
 rx_lists = {}
@@ -15,6 +16,7 @@ class Backend:
         self.name = name
         self.apikey = apikey
         self.thread = None
+        self.server = None
 
         if port is not None:
             self.port = port
@@ -130,7 +132,7 @@ def _approved(something):
 
 
 # TODO: Check API key
-def _run_backend(backend):  # noqa: C901
+def _create_backend(backend):  # noqa: C901
     app = Flask(backend.name)
 
     def _push():
@@ -190,7 +192,7 @@ def _run_backend(backend):  # noqa: C901
         func()
         return "Shutting down..."
 
-    app.run(port=backend.port)
+    return app
 
 
 def _call_shutdown(port):
@@ -205,9 +207,9 @@ def stop():
     global push_done
     for b in _backends.keys():
         if _backends[b].thread is not None:
-            if not _call_shutdown(_backends[b].port):
-                print("Could not shutdown " + _backends[b].name)
+            _backends[b].server.shutdown()
             _backends[b].thread.join()
+            _backends[b].server = None
             _backends[b].thread = None
 
     _backends = {}
@@ -218,9 +220,10 @@ def stop():
 
 
 def _create_thread(backend):
+    app = _create_backend(backend)
+    backend.server = serving.make_server(host="0.0.0.0", port=backend.port, app=app)
     backend.thread = threading.Thread(
-        target=_run_backend,
-        args=(backend,),
+        target=backend.server.serve_forever,
     )
     backend.thread.start()
 

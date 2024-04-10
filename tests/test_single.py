@@ -22,11 +22,11 @@ config = misc.Config(
 
 class SingleTest(unittest.TestCase):
     @classmethod
-    def setUpClass(self):
+    def setUpClass(cls):
         misc.setUpClass(config)
 
     @classmethod
-    def tearDownClass(self):
+    def tearDownClass(cls):
         misc.tearDownClass(config)
 
     @db.db_session
