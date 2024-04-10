@@ -19,7 +19,7 @@ apikey = "987654321"
 
 [trackers.multi]
 irc_nickname = "bipbopimalsobot"
-irc_server = "192.168.1.103"
+irc_server = "192.168.5.20"
 irc_port = 6667
 irc_channels = "#multi"
 torrent_https = true

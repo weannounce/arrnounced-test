@@ -22,18 +22,18 @@ apikey = "simpleradkey"
 
 [trackers.simple1]
 irc_nickname = "bipbopsimple1"
-irc_server = "192.168.1.103"
+irc_server = "192.168.5.20"
 irc_port = 6667
 irc_channels = "#simple1"
 
 [trackers.simple2]
 irc_nickname = "bipbopsimple2"
-irc_server = "192.168.1.103"
+irc_server = "192.168.5.20"
 irc_port = 6667
 irc_channels = "#simple2"
 
 [trackers.simple3]
 irc_nickname = "bipbopsimple3"
-irc_server = "192.168.1.103"
+irc_server = "192.168.5.20"
 irc_port = 6667
 irc_channels = "#simple3"

@@ -11,6 +11,6 @@ apikey = "sonapikey1"
 
 [trackers.simple1]
 irc_nickname = "bipbopmodes"
-irc_server = "192.168.1.103"
+irc_server = "192.168.5.20"
 irc_port = 6667
 irc_channels = "#simple1"

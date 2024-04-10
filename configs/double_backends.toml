@@ -36,7 +36,7 @@ apikey = "lidapikey2"
 
 [trackers.simple1]
 irc_nickname = "bipbopsimple1"
-irc_server = "192.168.1.103"
+irc_server = "192.168.5.20"
 irc_port = 6697
 irc_channels = "#simple1"
 irc_tls = true
