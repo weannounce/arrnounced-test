@@ -2,6 +2,7 @@ from subprocess import Popen
 import os
 import shutil
 import signal
+import time
 from helpers import config as global_config
 
 container_name = "arrnounced_test"
@@ -20,6 +21,8 @@ def stop(config):
         arr_process.wait()
     else:
         Popen(["docker", "container", "stop", container_name]).wait()
+        # Hopefully it stops in 3s
+        time.sleep(3)
 
 
 def run(config):
